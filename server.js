@@ -41,6 +41,11 @@ app.get("/api/contacto", (req, res) => {
     })));
 });
 
-app.listen(PORT, () => {
-    console.log("Pulseras Brillo corriendo en http://localhost:" + PORT);
-});
+// En Vercel se usa la app exportada; en tu computadora se levanta con npm start.
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log("Pulseras Brillo corriendo en http://localhost:" + PORT);
+    });
+}
+
+module.exports = app;
