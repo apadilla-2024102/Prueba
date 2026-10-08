@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Andrea Boutique</title>
+    <title>Drea Sparkle</title>
     <meta name="description" content="Fragancias, cuidado facial, maquillaje, pulseras, anillos y aretes. Precios en dólares y pedidos por WhatsApp.">
     <meta name="theme-color" content="#2e1233">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <a class="saltar" href="#productos">Ir a los productos</a>
 
     <header class="barra">
-        <a href="#inicio" class="marca" aria-label="Andrea Boutique, inicio">
-            <span class="marca-nombre">Andrea</span>
-            <span class="marca-sub">boutique</span>
+        <a href="#inicio" class="marca" aria-label="Drea Sparkle, inicio">
+            <span class="logo"><span class="logo-drea">Drea</span><span class="logo-sparkle">Sparkle<svg class="logo-destello" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg></span></span>
         </a>
         <nav class="menu" aria-label="Principal">
             <a href="#productos">Productos</a>
@@ -93,7 +93,9 @@
     </main>
 
     <footer class="pie">
-        <p>© <span id="anio"></span> Andrea Boutique. Precios en dólares (USD).</p>
+        <p class="pie-logo" aria-hidden="true"><span class="logo logo-grande"><span class="logo-drea">Drea</span><span class="logo-sparkle">Sparkle<svg class="logo-destello" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg></span></span></p>
+        <p>Fragancias, cuidado de la piel y joyería</p>
+        <p class="pie-legal">© <span id="anio"></span> Drea Sparkle. Precios en dólares (USD).</p>
     </footer>
 
     <!-- Detalle del producto -->
@@ -115,7 +117,8 @@
     <!-- Bienvenida con mensaje de interés -->
     <dialog class="bienvenida" id="bienvenida" aria-labelledby="bienvenida-titulo">
         <button class="cerrar" data-cerrar aria-label="Cerrar">&times;</button>
-        <h2 id="bienvenida-titulo">Bienvenida a Andrea</h2>
+        <p class="bienvenida-logo" aria-hidden="true"><span class="logo"><span class="logo-drea">Drea</span><span class="logo-sparkle">Sparkle<svg class="logo-destello" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg></span></span></p>
+        <h2 id="bienvenida-titulo">¡Bienvenida!</h2>
         <p>¿Buscas algo en especial? Escríbenos y te decimos qué hay disponible hoy.</p>
         <a href="#" class="boton boton-principal" data-numero="41408342">Escribir al 4140-8342</a>
         <a href="#" class="boton boton-borde" data-numero="51981445">Escribir al 5198-1445</a>

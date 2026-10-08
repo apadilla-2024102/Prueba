@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 // Números de WhatsApp. Código de país 502 (Guatemala): cámbialo si es otro país.
 const CODIGO_PAIS = "502";
 const NUMEROS = ["41408342", "51981445"];
-const MENSAJE_GENERAL = "¡Hola! Vi su página y me interesa comprar. ¿Me pueden dar más información?";
+const MENSAJE_GENERAL = "¡Hola! Vi la página de Drea Sparkle y me interesa comprar. ¿Me pueden dar más información?";
 
 const formatoUSD = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
@@ -32,7 +32,7 @@ app.get("/api/productos", (req, res) => {
         return {
             ...p,
             precioUSD,
-            whatsapp: enlaceWhatsApp(numero, "¡Hola! Me interesa: " + nombre + " de " + precioUSD + " USD. ¿Está disponible?")
+            whatsapp: enlaceWhatsApp(numero, "¡Hola, Drea Sparkle! Me interesa: " + nombre + " de " + precioUSD + " USD. ¿Está disponible?")
         };
     }));
 });
