@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Drea Sparkle</title>
-    <meta name="description" content="Fragancias, cuidado facial, maquillaje, pulseras, anillos y aretes. Precios en dólares y pedidos por WhatsApp.">
+    <meta name="description" content="Fragancias, cuidado facial, maquillaje, pulseras, anillos y aretes. Precios en quetzales y pedidos por WhatsApp.">
     <meta name="theme-color" content="#2e1233">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,7 +31,7 @@
         <section class="portada" id="inicio">
             <div class="portada-texto">
                 <h1>Fragancias, cuidado de la piel y joyería en un solo lugar</h1>
-                <p>Productos originales y accesorios escogidos uno por uno. Mira el precio en dólares y pídelo por WhatsApp.</p>
+                <p>Productos originales y accesorios escogidos uno por uno. Mira el precio y pídelo por WhatsApp.</p>
                 <div class="portada-acciones">
                     <a href="#productos" class="boton boton-principal">Ver productos</a>
                     <a href="#" class="boton boton-borde" data-numero="41408342">Escribir por WhatsApp</a>
@@ -55,7 +55,7 @@
         <section class="catalogo" id="productos" aria-labelledby="titulo-productos">
             <div class="catalogo-encabezado">
                 <h2 id="titulo-productos">Productos</h2>
-                <p>Todos los precios están en dólares (USD).</p>
+                <p>Precios en quetzales. El precio en dólares es aproximado.</p>
             </div>
             <div class="filtros" role="group" aria-label="Filtrar por categoría" id="filtros"></div>
             <p class="contador" id="contador" aria-live="polite"></p>
@@ -95,7 +95,7 @@
     <footer class="pie">
         <p class="pie-logo" aria-hidden="true"><span class="logo logo-grande"><span class="logo-drea">Drea</span><span class="logo-sparkle">Sparkle<svg class="logo-destello" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg></span></span></p>
         <p>Fragancias, cuidado de la piel y joyería</p>
-        <p class="pie-legal">© <span id="anio"></span> Drea Sparkle. Precios en dólares (USD).</p>
+        <p class="pie-legal">© <span id="anio"></span> Drea Sparkle. Precios en quetzales (Q).</p>
     </footer>
 
     <!-- Detalle del producto -->
@@ -103,6 +103,7 @@
         <button class="cerrar" data-cerrar aria-label="Cerrar">&times;</button>
         <div class="detalle-galeria">
             <img id="detalle-imagen" src="" alt="">
+            <div id="detalle-sin-foto" hidden></div>
             <div class="detalle-miniaturas" id="detalle-miniaturas"></div>
         </div>
         <div class="detalle-info">
@@ -110,6 +111,7 @@
             <h2 id="detalle-nombre"></h2>
             <p id="detalle-desc"></p>
             <p class="precio" id="detalle-precio"></p>
+            <p class="detalle-cantidad" id="detalle-cantidad"></p>
             <a class="boton boton-principal" id="detalle-pedir" target="_blank" rel="noopener">Pedir por WhatsApp</a>
         </div>
     </dialog>

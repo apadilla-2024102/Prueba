@@ -412,7 +412,41 @@ a { color: inherit; }
     line-height: 1;
 }
 
-.precio small { font-family: var(--sans); font-size: .7rem; color: var(--texto-suave); margin-left: 4px; }
+.precio small {
+    display: block;
+    margin-top: 6px;
+    font-family: var(--sans);
+    font-size: .75rem;
+    font-weight: 500;
+    color: var(--texto-suave);
+}
+
+.precio-consultar { font-size: .8em; font-style: italic; color: var(--tinta); }
+
+/* Recuadro para productos que aún no tienen foto */
+.sin-foto {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(160deg, var(--lila), var(--rubor));
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--texto-suave);
+}
+
+.sin-foto svg { width: 34px; height: 34px; fill: var(--oro); }
+
+#detalle-sin-foto { aspect-ratio: 1 / 1; }
+#detalle-sin-foto .sin-foto { min-height: 100%; }
+[hidden] { display: none !important; }
+
+.detalle-cantidad { font-size: .85rem; color: var(--frambuesa); font-weight: 500; }
+.detalle-cantidad:empty { display: none; }
 
 .producto-pie .boton { min-height: 44px; padding: 10px 14px; font-size: .85rem; }
 
@@ -578,7 +612,7 @@ dialog[open] { animation: abrir .3s cubic-bezier(.2, .7, .2, 1); }
 
 .detalle-marca { font-size: .85rem; color: var(--texto-suave); }
 .detalle-info h2 { font-size: 2.2rem; }
-.detalle-info > p:not(.precio):not(.detalle-marca) { color: var(--texto-suave); }
+.detalle-info > p:not(.precio):not(.detalle-marca):not(.detalle-cantidad) { color: var(--texto-suave); }
 .detalle-info .precio { font-size: 2.4rem; margin: 8px 0 12px; }
 
 /* ---------- WhatsApp fijo ---------- */

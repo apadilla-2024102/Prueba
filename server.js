@@ -10,7 +10,15 @@ const CODIGO_PAIS = "502";
 const NUMEROS = ["41408342", "51981445"];
 const MENSAJE_GENERAL = "¡Hola! Vi la página de Drea Sparkle y me interesa comprar. ¿Me pueden dar más información?";
 
+// Los precios del catálogo están en quetzales. El precio en dólares se calcula
+// con esta tasa y se muestra como aproximado: actualízala cuando cambie.
+const TASA_CAMBIO = 7.70;
+
 const formatoUSD = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+
+function formatoQ(valor) {
+    return "Q" + (Number.isInteger(valor) ? valor : valor.toFixed(2));
+}
 
 function enlaceWhatsApp(numero, mensaje) {
     return "https://wa.me/" + CODIGO_PAIS + numero + "?text=" + encodeURIComponent(mensaje);
@@ -22,17 +30,22 @@ app.get("/api/categorias", (req, res) => {
     res.json(categorias);
 });
 
-// Catálogo con precio en USD y enlace de WhatsApp ya armado.
+// Catálogo con precio en quetzales, aproximado en dólares y enlace de WhatsApp ya armado.
 // Se alternan los dos números para repartir los mensajes.
 app.get("/api/productos", (req, res) => {
     res.json(productos.map((p, i) => {
         const numero = NUMEROS[i % NUMEROS.length];
-        const precioUSD = formatoUSD.format(p.precio);
         const nombre = p.marca ? p.nombre + " (" + p.marca + ")" : p.nombre;
+        const tienePrecio = typeof p.precio === "number";
+        const precioQ = tienePrecio ? formatoQ(p.precio) : null;
+        const mensaje = tienePrecio
+            ? "¡Hola, Drea Sparkle! Me interesa: " + nombre + " de " + precioQ + ". ¿Está disponible?"
+            : "¡Hola, Drea Sparkle! Me interesa: " + nombre + ". ¿Qué precio tiene y está disponible?";
         return {
             ...p,
-            precioUSD,
-            whatsapp: enlaceWhatsApp(numero, "¡Hola, Drea Sparkle! Me interesa: " + nombre + " de " + precioUSD + " USD. ¿Está disponible?")
+            precioQ,
+            precioUSD: tienePrecio ? formatoUSD.format(p.precio / TASA_CAMBIO) : null,
+            whatsapp: enlaceWhatsApp(numero, mensaje)
         };
     }));
 });

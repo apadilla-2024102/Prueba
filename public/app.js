@@ -45,10 +45,31 @@ function filtrar(id) {
 }
 
 // ---------- Productos ----------
+function precioHTML(p) {
+    if (!p.precioQ) return '<span class="precio-consultar">Consultar precio</span>';
+    return p.precioQ + '<small>aprox. ' + p.precioUSD + ' USD</small>';
+}
+
+function sinFotoHTML() {
+    return '<span class="sin-foto"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg>Foto pronto</span>';
+}
+
+function selloHTML(p) {
+    if (p.cantidad === 1) return '<span class="producto-sello">Última pieza</span>';
+    if (p.destacado) return '<span class="producto-sello">Favorito</span>';
+    return "";
+}
+
+function textoBoton(p) {
+    return p.precioQ ? "Pedir por WhatsApp" : "Preguntar precio";
+}
+
 function pintarProductos() {
-    const lista = estado.categoria === "todos"
-        ? estado.productos
-        : estado.productos.filter((p) => p.categoria === estado.categoria);
+    // Los productos con foto van primero; sort es estable y respeta el orden del catálogo.
+    const lista = (estado.categoria === "todos"
+        ? estado.productos.slice()
+        : estado.productos.filter((p) => p.categoria === estado.categoria)
+    ).sort((a, b) => (b.imagenes.length > 0) - (a.imagenes.length > 0));
 
     const categoria = estado.categorias.find((c) => c.id === estado.categoria);
     document.getElementById("contador").textContent =
@@ -58,15 +79,17 @@ function pintarProductos() {
     document.getElementById("rejilla").innerHTML = lista.map((p) =>
         '<article class="producto">' +
             '<button class="producto-foto" data-detalle="' + p.id + '" aria-label="Ver detalles de ' + escapar(p.nombre) + '">' +
-                '<img src="' + p.imagenes[0] + '" alt="' + escapar(p.nombre) + '" loading="lazy" width="500" height="500">' +
-                (p.destacado ? '<span class="producto-sello">Favorito</span>' : '') +
+                (p.imagenes.length
+                    ? '<img src="' + p.imagenes[0] + '" alt="' + escapar(p.nombre) + '" loading="lazy" width="500" height="500">'
+                    : sinFotoHTML()) +
+                selloHTML(p) +
             '</button>' +
             '<p class="producto-marca">' + escapar(p.marca || "") + '</p>' +
             '<h3>' + escapar(p.nombre) + '</h3>' +
             '<p class="producto-desc">' + escapar(p.desc) + '</p>' +
             '<div class="producto-pie">' +
-                '<p class="precio">' + p.precioUSD + '<small>USD</small></p>' +
-                '<a class="boton boton-principal" href="' + p.whatsapp + '" target="_blank" rel="noopener">Pedir por WhatsApp</a>' +
+                '<p class="precio">' + precioHTML(p) + '</p>' +
+                '<a class="boton boton-principal" href="' + p.whatsapp + '" target="_blank" rel="noopener">' + textoBoton(p) + '</a>' +
             '</div>' +
         '</article>'
     ).join("");
@@ -84,7 +107,12 @@ function abrirDetalle(id) {
     if (!p) return;
 
     const imagen = document.getElementById("detalle-imagen");
+    const sinFoto = document.getElementById("detalle-sin-foto");
+    imagen.hidden = p.imagenes.length === 0;
+    sinFoto.hidden = p.imagenes.length > 0;
+    sinFoto.innerHTML = sinFotoHTML();
     const verImagen = (i) => {
+        if (!p.imagenes.length) return;
         imagen.src = p.imagenes[i];
         imagen.alt = p.nombre;
         document.querySelectorAll("#detalle-miniaturas button").forEach((b, j) => {
@@ -103,8 +131,11 @@ function abrirDetalle(id) {
     document.getElementById("detalle-marca").textContent = p.marca || "";
     document.getElementById("detalle-nombre").textContent = p.nombre;
     document.getElementById("detalle-desc").textContent = p.desc;
-    document.getElementById("detalle-precio").innerHTML = p.precioUSD + "<small>USD</small>";
+    document.getElementById("detalle-precio").innerHTML = precioHTML(p);
     document.getElementById("detalle-pedir").href = p.whatsapp;
+    document.getElementById("detalle-pedir").textContent = textoBoton(p);
+    document.getElementById("detalle-cantidad").textContent =
+        p.cantidad === 1 ? "Última pieza disponible" : p.cantidad > 1 ? p.cantidad + " piezas disponibles" : "";
     verImagen(0);
 
     if (bienvenida.open) bienvenida.close();
