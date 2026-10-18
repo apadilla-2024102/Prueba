@@ -1,17 +1,9 @@
 const estado = { categoria: "todos", categorias: [], productos: [] };
-
-function escapar(texto) {
-    return String(texto ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-}
+const { escapar, precioHTML, sinFotoHTML, textoBoton, ordenar, tarjetaHTML, categoriaHTML, contadorTexto } = window.Plantillas;
 
 // ---------- Categorías y filtros ----------
 function pintarCategorias() {
-    document.getElementById("categorias").innerHTML = estado.categorias.map((c) =>
-        '<li><button class="categoria" data-categoria="' + c.id + '" aria-pressed="false">' +
-            '<span class="categoria-foto"><img src="' + c.imagen + '" alt="" loading="lazy" width="300" height="400"></span>' +
-            escapar(c.nombre) +
-        '</button></li>'
-    ).join("");
+    document.getElementById("categorias").innerHTML = estado.categorias.map(categoriaHTML).join("");
 
     const contar = (id) => estado.productos.filter((p) => p.categoria === id).length;
     const filtros = [{ id: "todos", nombre: "Todos", total: estado.productos.length }]
@@ -45,56 +37,14 @@ function filtrar(id) {
 }
 
 // ---------- Productos ----------
-function precioHTML(p) {
-    if (!p.precioQ) return '<span class="precio-consultar">Consultar precio</span>';
-    return p.precioQ + '<small>aprox. ' + p.precioUSD + ' USD</small>';
-}
-
-function sinFotoHTML() {
-    return '<span class="sin-foto"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg>Foto pronto</span>';
-}
-
-function selloHTML(p) {
-    if (p.cantidad === 1) return '<span class="producto-sello">Última pieza</span>';
-    if (p.destacado) return '<span class="producto-sello">Favorito</span>';
-    return "";
-}
-
-function textoBoton(p) {
-    return p.precioQ ? "Pedir por WhatsApp" : "Preguntar precio";
-}
-
 function pintarProductos() {
-    // Los productos con foto van primero; sort es estable y respeta el orden del catálogo.
-    const lista = (estado.categoria === "todos"
-        ? estado.productos.slice()
-        : estado.productos.filter((p) => p.categoria === estado.categoria)
-    ).sort((a, b) => (b.imagenes.length > 0) - (a.imagenes.length > 0));
+    const lista = ordenar(estado.categoria === "todos"
+        ? estado.productos
+        : estado.productos.filter((p) => p.categoria === estado.categoria));
 
     const categoria = estado.categorias.find((c) => c.id === estado.categoria);
-    document.getElementById("contador").textContent =
-        lista.length + (lista.length === 1 ? " producto" : " productos") +
-        (categoria ? " en " + categoria.nombre.toLowerCase() : "");
-
-    document.getElementById("rejilla").innerHTML = lista.map((p) =>
-        '<article class="producto">' +
-            '<button class="producto-foto" data-detalle="' + p.id + '" aria-label="Ver detalles de ' + escapar(p.nombre) + '">' +
-                (p.imagenes.length
-                    ? '<img src="' + p.imagenes[0] + '" alt="' + escapar(p.nombre) + '" loading="lazy" width="500" height="500">'
-                    : sinFotoHTML()) +
-                selloHTML(p) +
-                (p.imagenes.length > 1 ? '<span class="producto-fotos">' + p.imagenes.length + ' fotos</span>' : '') +
-            '</button>' +
-            '<p class="producto-marca">' + escapar(p.marca || "") + '</p>' +
-            '<h3><button class="producto-nombre" data-detalle="' + p.id + '">' + escapar(p.nombre) + '</button></h3>' +
-            '<p class="producto-desc">' + escapar(p.desc) + '</p>' +
-            '<div class="producto-pie">' +
-                '<p class="precio">' + precioHTML(p) + '</p>' +
-                '<a class="boton boton-principal" href="' + p.whatsapp + '" target="_blank" rel="noopener">' + textoBoton(p) + '</a>' +
-                '<button class="enlace-detalle" data-detalle="' + p.id + '">Ver fotos y especificaciones</button>' +
-            '</div>' +
-        '</article>'
-    ).join("");
+    document.getElementById("contador").textContent = contadorTexto(lista.length, categoria);
+    document.getElementById("rejilla").innerHTML = lista.map(tarjetaHTML).join("");
 
     document.querySelectorAll("[data-detalle]").forEach((b) => {
         b.addEventListener("click", () => abrirDetalle(Number(b.dataset.detalle)));

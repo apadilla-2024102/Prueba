@@ -553,6 +553,21 @@ a { color: inherit; }
 .pie-logo .logo-destello { animation-delay: 1.2s; }
 .pie-legal { margin-top: 28px; font-size: .82rem; }
 
+/* ---------- Página no encontrada ---------- */
+.no-encontrada {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 24px var(--margen);
+    text-align: center;
+}
+
+.no-encontrada h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 500; }
+.no-encontrada p { color: var(--texto-suave); max-width: 40ch; }
+
 /* ---------- Ventanas ---------- */
 dialog {
     border: 0;
