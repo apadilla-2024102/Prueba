@@ -83,13 +83,15 @@ function pintarProductos() {
                     ? '<img src="' + p.imagenes[0] + '" alt="' + escapar(p.nombre) + '" loading="lazy" width="500" height="500">'
                     : sinFotoHTML()) +
                 selloHTML(p) +
+                (p.imagenes.length > 1 ? '<span class="producto-fotos">' + p.imagenes.length + ' fotos</span>' : '') +
             '</button>' +
             '<p class="producto-marca">' + escapar(p.marca || "") + '</p>' +
-            '<h3>' + escapar(p.nombre) + '</h3>' +
+            '<h3><button class="producto-nombre" data-detalle="' + p.id + '">' + escapar(p.nombre) + '</button></h3>' +
             '<p class="producto-desc">' + escapar(p.desc) + '</p>' +
             '<div class="producto-pie">' +
                 '<p class="precio">' + precioHTML(p) + '</p>' +
                 '<a class="boton boton-principal" href="' + p.whatsapp + '" target="_blank" rel="noopener">' + textoBoton(p) + '</a>' +
+                '<button class="enlace-detalle" data-detalle="' + p.id + '">Ver fotos y especificaciones</button>' +
             '</div>' +
         '</article>'
     ).join("");
@@ -101,32 +103,56 @@ function pintarProductos() {
 
 // ---------- Detalle del producto ----------
 const detalle = document.getElementById("detalle");
+const galeria = { fotos: [], actual: 0, nombre: "" };
+
+function verFoto(i) {
+    const total = galeria.fotos.length;
+    if (!total) return;
+    galeria.actual = (i + total) % total;
+    const imagen = document.getElementById("detalle-imagen");
+    imagen.src = galeria.fotos[galeria.actual];
+    imagen.alt = galeria.nombre + ", foto " + (galeria.actual + 1) + " de " + total;
+    document.getElementById("foto-contador").textContent = (galeria.actual + 1) + " / " + total;
+    document.querySelectorAll("#detalle-miniaturas button").forEach((b, j) => {
+        b.setAttribute("aria-current", String(galeria.actual === j));
+    });
+}
 
 function abrirDetalle(id) {
     const p = estado.productos.find((x) => x.id === id);
     if (!p) return;
 
-    const imagen = document.getElementById("detalle-imagen");
+    galeria.fotos = p.imagenes;
+    galeria.nombre = p.nombre;
+    galeria.actual = 0;
+    const hayFotos = p.imagenes.length > 0;
+    const variasFotos = p.imagenes.length > 1;
+
+    document.getElementById("detalle-imagen").hidden = !hayFotos;
     const sinFoto = document.getElementById("detalle-sin-foto");
-    imagen.hidden = p.imagenes.length === 0;
-    sinFoto.hidden = p.imagenes.length > 0;
+    sinFoto.hidden = hayFotos;
     sinFoto.innerHTML = sinFotoHTML();
-    const verImagen = (i) => {
-        if (!p.imagenes.length) return;
-        imagen.src = p.imagenes[i];
-        imagen.alt = p.nombre;
-        document.querySelectorAll("#detalle-miniaturas button").forEach((b, j) => {
-            b.setAttribute("aria-current", String(i === j));
-        });
-    };
+    ["foto-anterior", "foto-siguiente", "foto-contador"].forEach((id) => {
+        document.getElementById(id).hidden = !variasFotos;
+    });
 
     const miniaturas = document.getElementById("detalle-miniaturas");
-    miniaturas.innerHTML = p.imagenes.length > 1
+    miniaturas.innerHTML = variasFotos
         ? p.imagenes.map((src, i) =>
-            '<button aria-label="Foto ' + (i + 1) + ' de ' + p.imagenes.length + '"><img src="' + src + '" alt=""></button>'
+            '<button aria-label="Ver foto ' + (i + 1) + ' de ' + p.imagenes.length + '"><img src="' + src + '" alt=""></button>'
         ).join("")
         : "";
-    miniaturas.querySelectorAll("button").forEach((b, i) => b.addEventListener("click", () => verImagen(i)));
+    miniaturas.querySelectorAll("button").forEach((b, i) => b.addEventListener("click", () => verFoto(i)));
+
+    const categoria = estado.categorias.find((c) => c.id === p.categoria);
+    const filas = []
+        .concat(p.marca ? [["Marca", p.marca]] : [])
+        .concat(p.specs || [])
+        .concat(categoria ? [["Categoría", categoria.nombre]] : [])
+        .concat(p.cantidad ? [["Disponibles", p.cantidad === 1 ? "1 pieza" : p.cantidad + " piezas"]] : []);
+    document.getElementById("detalle-specs").innerHTML = filas.map(([nombre, valor]) =>
+        '<div><dt>' + escapar(nombre) + '</dt><dd>' + escapar(valor) + '</dd></div>'
+    ).join("");
 
     document.getElementById("detalle-marca").textContent = p.marca || "";
     document.getElementById("detalle-nombre").textContent = p.nombre;
@@ -134,13 +160,32 @@ function abrirDetalle(id) {
     document.getElementById("detalle-precio").innerHTML = precioHTML(p);
     document.getElementById("detalle-pedir").href = p.whatsapp;
     document.getElementById("detalle-pedir").textContent = textoBoton(p);
-    document.getElementById("detalle-cantidad").textContent =
-        p.cantidad === 1 ? "Última pieza disponible" : p.cantidad > 1 ? p.cantidad + " piezas disponibles" : "";
-    verImagen(0);
+    document.getElementById("detalle-cantidad").textContent = p.cantidad === 1 ? "Última pieza disponible" : "";
+    verFoto(0);
 
     if (bienvenida.open) bienvenida.close();
     detalle.showModal();
+    detalle.scrollTop = 0;
 }
+
+document.getElementById("foto-anterior").addEventListener("click", () => verFoto(galeria.actual - 1));
+document.getElementById("foto-siguiente").addEventListener("click", () => verFoto(galeria.actual + 1));
+
+// Flechas del teclado y deslizar con el dedo para cambiar de foto
+detalle.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") verFoto(galeria.actual - 1);
+    if (e.key === "ArrowRight") verFoto(galeria.actual + 1);
+});
+
+let toqueInicio = null;
+const escenario = document.getElementById("detalle-escenario");
+escenario.addEventListener("touchstart", (e) => { toqueInicio = e.touches[0].clientX; }, { passive: true });
+escenario.addEventListener("touchend", (e) => {
+    if (toqueInicio === null) return;
+    const distancia = e.changedTouches[0].clientX - toqueInicio;
+    if (Math.abs(distancia) > 40) verFoto(galeria.actual + (distancia < 0 ? 1 : -1));
+    toqueInicio = null;
+});
 
 // ---------- Ventanas: cerrar con el botón, Escape o tocando afuera ----------
 document.querySelectorAll("dialog").forEach((d) => {
