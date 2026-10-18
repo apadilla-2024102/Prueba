@@ -102,17 +102,31 @@
     <dialog class="detalle" id="detalle" aria-labelledby="detalle-nombre">
         <button class="cerrar" data-cerrar aria-label="Cerrar">&times;</button>
         <div class="detalle-galeria">
-            <img id="detalle-imagen" src="" alt="">
-            <div id="detalle-sin-foto" hidden></div>
+            <div class="detalle-escenario" id="detalle-escenario">
+                <img id="detalle-imagen" src="" alt="">
+                <div id="detalle-sin-foto" hidden></div>
+                <button class="galeria-flecha galeria-anterior" id="foto-anterior" aria-label="Foto anterior">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+                </button>
+                <button class="galeria-flecha galeria-siguiente" id="foto-siguiente" aria-label="Foto siguiente">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+                </button>
+                <span class="galeria-contador" id="foto-contador" aria-live="polite"></span>
+            </div>
             <div class="detalle-miniaturas" id="detalle-miniaturas"></div>
         </div>
         <div class="detalle-info">
             <p class="detalle-marca" id="detalle-marca"></p>
             <h2 id="detalle-nombre"></h2>
-            <p id="detalle-desc"></p>
             <p class="precio" id="detalle-precio"></p>
             <p class="detalle-cantidad" id="detalle-cantidad"></p>
-            <a class="boton boton-principal" id="detalle-pedir" target="_blank" rel="noopener">Pedir por WhatsApp</a>
+            <p class="detalle-desc" id="detalle-desc"></p>
+            <h3 class="specs-titulo">Especificaciones</h3>
+            <dl class="specs" id="detalle-specs"></dl>
+            <div class="detalle-accion">
+                <a class="boton boton-principal" id="detalle-pedir" target="_blank" rel="noopener">Pedir por WhatsApp</a>
+                <p class="detalle-nota">El pago y la entrega se coordinan por WhatsApp.</p>
+            </div>
         </div>
     </dialog>
 
