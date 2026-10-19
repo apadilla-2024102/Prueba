@@ -48,7 +48,10 @@
             '<div class="producto-pie">' +
                 '<p class="precio">' + precioHTML(p) + '</p>' +
                 '<a class="boton boton-principal" href="' + p.whatsapp + '" target="_blank" rel="noopener">' + textoBoton(p) + '</a>' +
-                '<button class="enlace-detalle" data-detalle="' + p.id + '">Ver fotos y especificaciones</button>' +
+                '<button class="boton boton-detalle" data-detalle="' + p.id + '">' +
+                    '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5.5-5.5L8 18"/></svg>' +
+                    '<span class="detalle-largo">Ver fotos y especificaciones</span><span class="detalle-corto">Fotos y detalles</span>' +
+                '</button>' +
             '</div>' +
         '</article>';
     }

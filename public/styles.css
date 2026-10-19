@@ -413,21 +413,35 @@ a { color: inherit; }
     font-weight: 500;
 }
 
-.enlace-detalle {
-    min-height: 40px;
-    padding: 0;
-    border: 0;
-    background: none;
-    font-family: var(--sans);
-    font-size: .85rem;
-    font-weight: 500;
+/* Botón secundario de la tarjeta: abre la galería y las especificaciones */
+.boton-detalle {
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 14px;
+    background: var(--rubor);
+    border-color: var(--rubor);
     color: var(--tinta);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    cursor: pointer;
+    font-size: .85rem;
 }
 
-.enlace-detalle:hover { color: var(--frambuesa); }
+.boton-detalle svg {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.detalle-corto { display: none; }
+
+.boton-detalle:hover {
+    background: var(--tinta);
+    border-color: var(--tinta);
+    color: #fff;
+}
 
 .producto-desc {
     margin-top: 6px;
@@ -437,12 +451,15 @@ a { color: inherit; }
 }
 
 .producto-pie {
-    margin-top: 14px;
+    margin-top: auto;
+    padding-top: 14px;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 14px;
+    gap: 10px;
 }
+
+.producto-pie .precio { margin-bottom: 4px; }
 
 .precio {
     font-family: var(--serif);
@@ -796,6 +813,8 @@ dialog[open] { animation: abrir .3s cubic-bezier(.2, .7, .2, 1); }
     .producto h3 { font-size: 1.2rem; }
     .producto-desc { display: none; }
     .producto-pie .boton { padding: 10px 8px; font-size: .8rem; }
+    .detalle-largo { display: none; }
+    .detalle-corto { display: inline; }
     .precio { font-size: 1.45rem; }
 }
 
