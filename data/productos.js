@@ -6,6 +6,10 @@
 // Las fotos de /img/detalle/ son acercamientos sacados de la foto original.
 // specs: especificaciones que se ven en el detalle del producto.
 
+// Fecha de la última actualización del catálogo (año-mes-día).
+// Cámbiala cada vez que agregues productos o cambies precios: Google la lee en el sitemap.
+const actualizado = "2026-10-19";
+
 const categorias = [
     { id: "fragancias", nombre: "Cremas y fragancias", imagen: "/img/vs-love-spell.jpg" },
     { id: "facial", nombre: "Cuidado facial", imagen: "/img/ordinary-hialuronico.jpg" },
@@ -121,4 +125,4 @@ const productos = [
         specs: [["Diseño", "Trébol"], ["Tono", "Dorado"]] }
 ];
 
-module.exports = { categorias, productos };
+module.exports = { categorias, productos, actualizado };
