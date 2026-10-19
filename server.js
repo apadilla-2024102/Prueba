@@ -1,7 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-const { categorias, productos } = require("./data/productos");
+const { categorias, productos, actualizado } = require("./data/productos");
 const plantillas = require("./public/plantillas");
 
 const app = express();
@@ -16,7 +16,6 @@ const PORT = process.env.PORT || 3000;
 const SITE_URL = (process.env.SITE_URL || "https://dreasparkle.vercel.app").replace(/\/$/, "");
 const GOOGLE_SITE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION || "";
 const NOMBRE_TIENDA = "Drea Sparkle";
-const ACTUALIZADO = fs.statSync(path.join(__dirname, "data", "productos.js")).mtime.toISOString().slice(0, 10);
 
 // Vercel atiende detrás de un proxy: así req.protocol es "https"
 app.set("trust proxy", true);
@@ -188,7 +187,7 @@ app.get("/sitemap.xml", (req, res) => {
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n' +
         "  <url>\n" +
         "    <loc>" + xml(base + "/") + "</loc>\n" +
-        "    <lastmod>" + ACTUALIZADO + "</lastmod>\n" +
+        "    <lastmod>" + actualizado + "</lastmod>\n" +
         imagenes.map((img) => "    <image:image><image:loc>" + xml(base + img) + "</image:loc></image:image>\n").join("") +
         "  </url>\n" +
         "</urlset>\n"
