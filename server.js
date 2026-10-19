@@ -8,12 +8,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ---------- Google Search Console ----------
-// SITE_URL: la dirección pública de la página, sin "/" al final
-//   (ej. https://dreasparkle.vercel.app). Si no se define, se usa la del navegador.
+// SITE_URL: la dirección pública de la página, sin "/" al final.
+//   Por defecto https://dreasparkle.vercel.app; cámbiala si usas otro dominio.
 // GOOGLE_SITE_VERIFICATION: el código que da Search Console en
 //   "Etiqueta HTML" (solo lo que va dentro de content="...").
 // Las dos se configuran en Vercel: Settings > Environment Variables.
-const SITE_URL = (process.env.SITE_URL || "").replace(/\/$/, "");
+const SITE_URL = (process.env.SITE_URL || "https://dreasparkle.vercel.app").replace(/\/$/, "");
 const GOOGLE_SITE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION || "";
 const NOMBRE_TIENDA = "Drea Sparkle";
 const ACTUALIZADO = fs.statSync(path.join(__dirname, "data", "productos.js")).mtime.toISOString().slice(0, 10);
