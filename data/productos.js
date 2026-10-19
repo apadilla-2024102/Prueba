@@ -58,7 +58,7 @@ const productos = [
         specs: [["Tipo", "Perfume mist para cuerpo y cabello"], ["Uso", "Rocía sobre la piel y el cabello. Puedes combinarla con otra Cheirosa."]] },
     { id: 15, categoria: "fragancias", nombre: "Cheirosa 39", marca: "Sol de Janeiro", desc: "Bruma perfumada para cuerpo y cabello.", precio: null, imagenes: fotosDeGrupo(15, "/img/sdj-76-39.jpg"),
         specs: [["Tipo", "Perfume mist para cuerpo y cabello"], ["Uso", "Rocía sobre la piel y el cabello. Puedes combinarla con otra Cheirosa."]] },
-    { id: 16, categoria: "fragancias", nombre: "Tan Lines", marca: "Sol de Janeiro", desc: "Bruma perfumada con tuberosa y coco.", precio: null, imagenes: fotosDeGrupo(16, "/img/sdj-59-tan-lines.jpg"),
+    { id: 16, categoria: "fragancias", nombre: "Tan Lines", marca: "Sol de Janeiro", desc: "Bruma perfumada con tuberosa solar y leche de coco.", precio: null, imagenes: ["/img/nuevas/sdj-tan-lines.jpg", "/img/nuevas/sdj-tan-lines-a.jpg", "/img/nuevas/sdj-tan-lines-b.jpg"],
         specs: [["Tipo", "Perfume mist para cuerpo y cabello"], ["Aroma", "Tuberosa solar y leche de coco"], ["Uso", "Rocía sobre la piel y el cabello."]] },
 
     // ---------- Cuidado facial ----------
