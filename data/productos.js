@@ -72,10 +72,10 @@ const productos = [
         specs: [["Tipo", "Crema con vitamina C (sin agua ni silicona)"], ["Contenido", "30 ml"], ["Ayuda con", "Luminosidad y tono disparejo"], ["Uso", "Una capa delgada sobre el rostro limpio. Puede dar un leve hormigueo al inicio."]] },
     { id: 21, categoria: "facial", nombre: "Acne Foaming Cream Cleanser", marca: "CeraVe", desc: "Limpiador en crema espumosa para piel con acné.", precio: 45, cantidad: 3, imagenes: [],
         specs: [["Tipo", "Limpiador facial en crema espumosa"], ["Ideal para", "Piel con tendencia al acné"], ["Uso", "Sobre el rostro húmedo, masajea y enjuaga."]] },
-    { id: 22, categoria: "facial", nombre: "Set Vitamina C", marca: "Dr. Rashel", desc: "Set de cuidado facial con vitamina C para una piel más luminosa.", precio: 65, imagenes: ["/img/nuevas/dr-rashel-vitamina-c.jpg", "/img/nuevas/dr-rashel-vitamina-c-a.jpg", "/img/nuevas/dr-rashel-vitamina-c-b.jpg"],
-        specs: [["Tipo", "Set de cuidado facial"], ["Línea", "Vitamina C"], ["Precio por caja", "Q250"], ["Contenido", "Pregúntanos qué incluye el set"]] },
-    { id: 48, categoria: "facial", nombre: "Set White Skin", marca: "Dr. Rashel", desc: "Set de cuidado facial de 4 piezas de la línea White Skin.", precio: 65, imagenes: ["/img/nuevas/dr-rashel-white-skin.jpg", "/img/nuevas/dr-rashel-white-skin-a.jpg", "/img/nuevas/dr-rashel-white-skin-b.jpg"],
-        specs: [["Tipo", "Set de cuidado facial"], ["Línea", "White Skin"], ["Contenido", "4 piezas con estuche"], ["Precio por caja", "Q250"]] },
+    { id: 22, categoria: "facial", nombre: "Set Vitamina C", marca: "Dr. Rashel", desc: "Set de cuidado facial con vitamina C para una piel más luminosa.", precio: 225, imagenes: ["/img/nuevas/dr-rashel-vitamina-c.jpg", "/img/nuevas/dr-rashel-vitamina-c-a.jpg", "/img/nuevas/dr-rashel-vitamina-c-b.jpg"],
+        specs: [["Tipo", "Set de cuidado facial"], ["Línea", "Vitamina C"], ["Contenido", "Pregúntanos qué incluye el set"]] },
+    { id: 48, categoria: "facial", nombre: "Set White Skin", marca: "Dr. Rashel", desc: "Set de cuidado facial de 4 piezas de la línea White Skin.", precio: 225, imagenes: ["/img/nuevas/dr-rashel-white-skin.jpg", "/img/nuevas/dr-rashel-white-skin-a.jpg", "/img/nuevas/dr-rashel-white-skin-b.jpg"],
+        specs: [["Tipo", "Set de cuidado facial"], ["Línea", "White Skin"], ["Contenido", "4 piezas con estuche"]] },
 
     // ---------- Maquillaje ----------
     { id: 23, categoria: "maquillaje", nombre: "Peptide Lip Treatment caja roja", marca: "Rhode", desc: "Bálsamo de labios con péptidos, tubo blanco.", precio: 25, imagenes: ["/img/nuevas/rhode-treatment-rojo.jpg", "/img/nuevas/rhode-treatment-rojo-a.jpg", "/img/nuevas/rhode-treatment-rojo-b.jpg"], destacado: true,
