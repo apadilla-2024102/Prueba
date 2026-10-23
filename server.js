@@ -15,10 +15,15 @@ const PORT = process.env.PORT || 3000;
 // Las dos se configuran en Vercel: Settings > Environment Variables.
 const SITE_URL = (process.env.SITE_URL || "https://dreasparkle.vercel.app").replace(/\/$/, "");
 const GOOGLE_SITE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION || "";
+// GOOGLE_BUSINESS_URL: el enlace de la ficha de Google (Perfil de Empresa).
+//   En business.google.com > tu negocio > "Compartir perfil", copia el enlace.
+//   Se usa en el pie de página y en los datos estructurados (sameAs).
+const GOOGLE_BUSINESS_URL = process.env.GOOGLE_BUSINESS_URL || "";
 const NOMBRE_TIENDA = "Drea Sparkle";
 
 // Vercel atiende detrás de un proxy: así req.protocol es "https"
 app.set("trust proxy", true);
+app.disable("x-powered-by");
 
 // Números de WhatsApp. Código de país 502 (Guatemala): cámbialo si es otro país.
 const CODIGO_PAIS = "502";
@@ -39,7 +44,40 @@ function enlaceWhatsApp(numero, mensaje) {
     return "https://wa.me/" + CODIGO_PAIS + numero + "?text=" + encodeURIComponent(mensaje);
 }
 
-app.use(express.static(path.join(__dirname, "public"), { index: false }));
+// ---------- Forzar HTTPS ----------
+// Redirige http:// a https:// (menos en tu computadora) y le pide al navegador
+// que siempre use https (HSTS). Vercel ya redirige, esto cubre cualquier otro hosting.
+const ES_LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/;
+app.use((req, res, next) => {
+    if (ES_LOCAL.test(req.get("host") || "")) return next();
+    if (!req.secure) return res.redirect(308, "https://" + req.get("host") + req.originalUrl);
+    res.set("Strict-Transport-Security", "max-age=63072000");
+    next();
+});
+
+// Cabeceras de seguridad básicas
+app.use((req, res, next) => {
+    res.set({
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "X-Frame-Options": "SAMEORIGIN"
+    });
+    next();
+});
+
+// ---------- Velocidad de carga ----------
+// Las fotos casi no cambian: el navegador las guarda una semana.
+// CSS y JS se guardan un día y se revisan si cambiaron (ETag).
+app.use(express.static(path.join(__dirname, "public"), {
+    index: false,
+    setHeaders(res, ruta) {
+        if (/\.(jpe?g|png|webp|svg)$/i.test(ruta)) {
+            res.set("Cache-Control", "public, max-age=604800, stale-while-revalidate=86400");
+        } else if (/\.(css|js)$/i.test(ruta)) {
+            res.set("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
+        }
+    }
+}));
 
 app.get("/api/categorias", (req, res) => {
     res.json(categorias);
@@ -101,7 +139,8 @@ function datosEstructurados(base, lista) {
             telephone: NUMEROS.map((n) => "+" + CODIGO_PAIS + n),
             currenciesAccepted: "GTQ",
             priceRange: "Q" + Math.min(...precios) + " - Q" + Math.max(...precios),
-            address: { "@type": "PostalAddress", addressCountry: "GT" }
+            address: { "@type": "PostalAddress", addressCountry: "GT" },
+            ...(GOOGLE_BUSINESS_URL ? { sameAs: [GOOGLE_BUSINESS_URL], hasMap: GOOGLE_BUSINESS_URL } : {})
         },
         {
             "@context": "https://schema.org",
@@ -131,33 +170,69 @@ function datosEstructurados(base, lista) {
     ];
 }
 
-function etiquetasSEO(base, lista) {
-    const titulo = "Drea Sparkle | Fragancias, skincare y joyería en Guatemala";
-    const descripcion = "Fragancias Victoria's Secret y Sol de Janeiro, cuidado facial, maquillaje y joyería. Precios en quetzales y pedidos por WhatsApp.";
-    const json = JSON.stringify(datosEstructurados(base, lista)).replace(/</g, "\\u003c");
+// Meta títulos y descripciones para redes sociales y buscadores.
+// ruta: la dirección de la página ("/", "/privacidad"); null para páginas que no se indexan.
+function etiquetasSEO(base, { titulo, descripcion, ruta, datos }) {
+    const e = plantillas.escapar;
+    const url = ruta ? base + ruta : null;
     return [
-        '<link rel="canonical" href="' + base + '/">',
-        '<meta name="robots" content="index, follow, max-image-preview:large">',
-        GOOGLE_SITE_VERIFICATION ? '<meta name="google-site-verification" content="' + plantillas.escapar(GOOGLE_SITE_VERIFICATION) + '">' : "",
+        url ? '<link rel="canonical" href="' + url + '">' : "",
+        '<meta name="robots" content="' + (url ? "index, follow, max-image-preview:large" : "noindex, follow") + '">',
+        GOOGLE_SITE_VERIFICATION ? '<meta name="google-site-verification" content="' + e(GOOGLE_SITE_VERIFICATION) + '">' : "",
         '<meta property="og:type" content="website">',
         '<meta property="og:locale" content="es_GT">',
         '<meta property="og:site_name" content="' + NOMBRE_TIENDA + '">',
-        '<meta property="og:title" content="' + plantillas.escapar(titulo) + '">',
-        '<meta property="og:description" content="' + plantillas.escapar(descripcion) + '">',
-        '<meta property="og:url" content="' + base + '/">',
+        '<meta property="og:title" content="' + e(titulo) + '">',
+        '<meta property="og:description" content="' + e(descripcion) + '">',
+        url ? '<meta property="og:url" content="' + url + '">' : "",
         '<meta property="og:image" content="' + base + '/img/og-drea-sparkle.jpg">',
         '<meta property="og:image:width" content="1200">',
         '<meta property="og:image:height" content="630">',
+        '<meta property="og:image:alt" content="Productos de Drea Sparkle">',
         '<meta name="twitter:card" content="summary_large_image">',
-        '<script type="application/ld+json">' + json + '</script>'
+        '<meta name="twitter:title" content="' + e(titulo) + '">',
+        '<meta name="twitter:description" content="' + e(descripcion) + '">',
+        datos ? '<script type="application/ld+json">' + JSON.stringify(datos).replace(/</g, "\\u003c") + '</script>' : ""
     ].filter(Boolean).join("\n    ");
+}
+
+// Enlaces del pie: política de privacidad y ficha de Google (si está configurada).
+function enlacesPie() {
+    return '<nav class="pie-enlaces" aria-label="Información">' +
+        '<a href="/privacidad">Política de privacidad</a>' +
+        (GOOGLE_BUSINESS_URL
+            ? '<a href="' + plantillas.escapar(GOOGLE_BUSINESS_URL) + '" target="_blank" rel="noopener">Encuéntranos en Google</a>'
+            : "") +
+    '</nav>';
+}
+
+// Páginas secundarias (privacidad, 404) con la misma barra y pie que la tienda.
+const PAGINA = fs.readFileSync(path.join(__dirname, "views", "pagina.html"), "utf8");
+const PRIVACIDAD = fs.readFileSync(path.join(__dirname, "views", "privacidad.html"), "utf8");
+const NO_ENCONTRADA = fs.readFileSync(path.join(__dirname, "views", "404.html"), "utf8");
+
+function paginaHTML(base, { titulo, descripcion, ruta, contenido }) {
+    const e = plantillas.escapar;
+    return PAGINA
+        .replace("<!--TITULO-->", e(titulo))
+        .replace("<!--DESCRIPCION-->", e(descripcion))
+        .replace("<!--SEO-->", etiquetasSEO(base, { titulo, descripcion, ruta }))
+        .replace("<!--CONTENIDO-->", contenido)
+        .replace("<!--ENLACES-PIE-->", enlacesPie())
+        .replace("<!--ANIO-->", String(new Date().getFullYear()));
 }
 
 app.get("/", (req, res) => {
     const base = urlBase(req);
     const lista = productosParaMostrar();
     const html = PLANTILLA
-        .replace("<!--SEO-->", etiquetasSEO(base, lista))
+        .replace("<!--SEO-->", etiquetasSEO(base, {
+            titulo: "Drea Sparkle | Fragancias, skincare y joyería en Guatemala",
+            descripcion: "Fragancias Victoria's Secret y Sol de Janeiro, cuidado facial, maquillaje y joyería. Precios en quetzales y pedidos por WhatsApp.",
+            ruta: "/",
+            datos: datosEstructurados(base, lista)
+        }))
+        .replace("<!--ENLACES-PIE-->", enlacesPie())
         .replace("<!--CATEGORIAS-->", categorias.map(plantillas.categoriaHTML).join(""))
         .replace("<!--CONTADOR-->", plantillas.contadorTexto(lista.length))
         .replace("<!--PRODUCTOS-->", plantillas.ordenar(lista).map(plantillas.tarjetaHTML).join(""))
@@ -165,6 +240,23 @@ app.get("/", (req, res) => {
         .replace(/href="#"( class="[^"]*")? data-numero="(\d+)"/g, (todo, clase, numero) =>
             'href="' + enlaceWhatsApp(numero, MENSAJE_GENERAL) + '"' + (clase || "") + ' data-numero="' + numero + '"');
     res.type("html").send(html);
+});
+
+// ---------- Política de privacidad ----------
+// Fecha de la última vez que se cambió el texto de views/privacidad.html.
+const PRIVACIDAD_ACTUALIZADA = "2026-10-23";
+
+app.get("/privacidad", (req, res) => {
+    const [anio, mes, dia] = PRIVACIDAD_ACTUALIZADA.split("-").map(Number);
+    const fecha = new Date(Date.UTC(anio, mes - 1, dia))
+        .toLocaleDateString("es-GT", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+    const numeros = NUMEROS.map((n) => n.slice(0, 4) + "-" + n.slice(4)).join(" o al ");
+    res.type("html").send(paginaHTML(urlBase(req), {
+        titulo: "Política de privacidad | Drea Sparkle",
+        descripcion: "Qué datos usa Drea Sparkle cuando visitas la tienda o haces un pedido por WhatsApp, y cómo pedir que los corrijamos o borremos.",
+        ruta: "/privacidad",
+        contenido: PRIVACIDAD.replace("<!--FECHA-->", fecha).replace("<!--NUMEROS-->", numeros)
+    }));
 });
 
 // ---------- robots.txt y sitemap.xml ----------
@@ -190,21 +282,28 @@ app.get("/sitemap.xml", (req, res) => {
         "    <lastmod>" + actualizado + "</lastmod>\n" +
         imagenes.map((img) => "    <image:image><image:loc>" + xml(base + img) + "</image:loc></image:image>\n").join("") +
         "  </url>\n" +
+        "  <url>\n" +
+        "    <loc>" + xml(base + "/privacidad") + "</loc>\n" +
+        "    <lastmod>" + PRIVACIDAD_ACTUALIZADA + "</lastmod>\n" +
+        "  </url>\n" +
         "</urlset>\n"
     );
 });
 
-// ---------- Página no encontrada ----------
+// ---------- Página no encontrada (404 personalizada) ----------
 app.use((req, res) => {
-    res.status(404).type("html").send(
-        '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">' +
-        '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-        '<meta name="robots" content="noindex"><title>Página no encontrada | Drea Sparkle</title>' +
-        '<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"></head>' +
-        '<body><main class="no-encontrada"><h1>Esta página no existe</h1>' +
-        '<p>Puede que el enlace esté mal escrito o que el producto ya no esté disponible.</p>' +
-        '<a class="boton boton-principal" href="/">Ir a la tienda</a></main></body></html>'
-    );
+    const categoriasHTML = categorias.map((c) =>
+        '<li><a href="/#productos"><img src="' + c.imagen + '" alt="" loading="lazy" width="300" height="400">' +
+        plantillas.escapar(c.nombre) + '</a></li>'
+    ).join("");
+    res.status(404).type("html").send(paginaHTML(urlBase(req), {
+        titulo: "Página no encontrada | Drea Sparkle",
+        descripcion: "Esta página no existe. Mira el catálogo de Drea Sparkle o escríbenos por WhatsApp.",
+        ruta: null,
+        contenido: NO_ENCONTRADA
+            .replace("<!--WHATSAPP-->", enlaceWhatsApp(NUMEROS[0], MENSAJE_GENERAL))
+            .replace("<!--CATEGORIAS-->", categoriasHTML)
+    }));
 });
 
 // En Vercel se usa la app exportada; en tu computadora se levanta con npm start.
