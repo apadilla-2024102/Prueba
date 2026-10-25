@@ -114,7 +114,7 @@ router.use("/api", (req, res, next) => {
 router.get("/api/sesion", (req, res) => res.json({ usuario: req.admin.usuario }));
 
 router.get("/api/catalogo", async (req, res) => {
-    const { categorias, productos } = await almacen.leer();
+    const { categorias, productos } = await almacen.leerActual();
     res.json({ categorias, productos, almacenamiento: almacen.USA_BLOB ? "blob" : "local" });
 });
 
@@ -169,12 +169,6 @@ function limpiarProducto(datos, categorias) {
     };
 }
 
-// Fotos que dejó de usar el catálogo después de un cambio
-function fotosSueltas(antes, catalogo) {
-    const enUso = new Set(catalogo.productos.flatMap((p) => p.imagenes));
-    return antes.filter((img) => !enUso.has(img));
-}
-
 function responderError(res, e) {
     const esDelUsuario = e instanceof ErrorDeDatos;
     if (!esDelUsuario) console.error(e);
@@ -197,16 +191,12 @@ router.post("/api/productos", async (req, res) => {
 router.put("/api/productos/:id", async (req, res) => {
     const id = Number(req.params.id);
     try {
-        let sueltas = [];
         const producto = await almacen.modificar((catalogo) => {
             const i = catalogo.productos.findIndex((p) => p.id === id);
             if (i < 0) throw new ErrorDeDatos("Ese producto ya no existe.");
-            const antes = catalogo.productos[i].imagenes;
             catalogo.productos[i] = { id, ...limpiarProducto(req.body, catalogo.categorias) };
-            sueltas = fotosSueltas(antes, catalogo);
             return catalogo.productos[i];
         });
-        await almacen.borrarImagenes(sueltas);
         res.json(producto);
     } catch (e) { responderError(res, e); }
 });
@@ -214,14 +204,11 @@ router.put("/api/productos/:id", async (req, res) => {
 router.delete("/api/productos/:id", async (req, res) => {
     const id = Number(req.params.id);
     try {
-        let sueltas = [];
         await almacen.modificar((catalogo) => {
             const i = catalogo.productos.findIndex((p) => p.id === id);
             if (i < 0) throw new ErrorDeDatos("Ese producto ya no existe.");
-            const [borrado] = catalogo.productos.splice(i, 1);
-            sueltas = fotosSueltas(borrado.imagenes, catalogo);
+            catalogo.productos.splice(i, 1);
         });
-        await almacen.borrarImagenes(sueltas);
         res.json({ ok: true });
     } catch (e) { responderError(res, e); }
 });

@@ -7,6 +7,12 @@
 // Sin esa variable (en tu computadora) se guarda en data/catalogo.json y public/img/subidas/.
 //
 // La primera vez se parte del catálogo escrito en data/productos.js.
+//
+// Ojo: un archivo público que se sobrescribe en Blob puede seguir leyéndose viejo
+// hasta 60 segundos. Por eso cada cambio se guarda como una versión nueva con
+// nombre propio (catalogo/v-....json), que nunca está vieja, y el panel siempre
+// trabaja sobre la versión más reciente. Se conservan las últimas versiones como respaldo.
+// catalogo.json se sobrescribe también, solo para que la tienda lo lea rápido.
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
@@ -16,6 +22,8 @@ const USA_BLOB = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 const blob = USA_BLOB ? require("@vercel/blob") : null;
 
 const ARCHIVO_BLOB = "catalogo.json";
+const CARPETA_VERSIONES = "catalogo/";
+const VERSIONES_GUARDADAS = 30;
 const ARCHIVO_LOCAL = path.join(__dirname, "catalogo.json");
 const CARPETA_LOCAL = path.join(__dirname, "..", "public", "img", "subidas");
 
@@ -31,20 +39,42 @@ function copiaInicial() {
     }));
 }
 
-// Lee el catálogo guardado, sin pasar por la caché
-async function leerGuardado() {
+async function leerBlob(direccion) {
+    const r = await blob.get(direccion, { access: "public", useCache: false });
+    if (!r || r.statusCode !== 200) return null;
+    return JSON.parse(await new Response(r.stream).text());
+}
+
+// Versiones guardadas, de la más nueva a la más vieja
+async function listarVersiones() {
+    const versiones = [];
+    let cursor;
+    do {
+        const r = await blob.list({ prefix: CARPETA_VERSIONES, cursor });
+        versiones.push(...r.blobs);
+        cursor = r.hasMore ? r.cursor : undefined;
+    } while (cursor);
+    return versiones.sort((a, b) => b.pathname.localeCompare(a.pathname));
+}
+
+// El catálogo más reciente, sin cachés: para el panel y antes de guardar un cambio
+async function leerActual() {
     if (USA_BLOB) {
-        const r = await blob.get(ARCHIVO_BLOB, { access: "public", useCache: false });
-        if (!r || r.statusCode !== 200) return copiaInicial();
-        return JSON.parse(await new Response(r.stream).text());
+        const [ultima] = await listarVersiones();
+        if (ultima) return leerBlob(ultima.url);
+        // Antes de las versiones solo existía catalogo.json
+        return (await leerBlob(ARCHIVO_BLOB)) || copiaInicial();
     }
     if (!fs.existsSync(ARCHIVO_LOCAL)) return copiaInicial();
     return JSON.parse(fs.readFileSync(ARCHIVO_LOCAL, "utf8"));
 }
 
+// Para la tienda: catalogo.json (puede tardar hasta un minuto en mostrar un cambio)
 async function leer() {
     if (enMemoria && Date.now() - enMemoria.hora < VIGENCIA_MS) return enMemoria.catalogo;
-    const catalogo = await leerGuardado();
+    const catalogo = USA_BLOB
+        ? (await leerBlob(ARCHIVO_BLOB)) || copiaInicial()
+        : await leerActual();
     enMemoria = { catalogo, hora: Date.now() };
     return catalogo;
 }
@@ -53,6 +83,9 @@ async function guardar(catalogo) {
     catalogo.actualizado = new Date().toISOString().slice(0, 10);
     const texto = JSON.stringify(catalogo, null, 2);
     if (USA_BLOB) {
+        // El nombre empieza con la hora, así el orden alfabético es el orden en que se guardaron
+        const version = CARPETA_VERSIONES + "v-" + String(Date.now()).padStart(15, "0") + "-" + crypto.randomBytes(3).toString("hex") + ".json";
+        await blob.put(version, texto, { access: "public", contentType: "application/json", addRandomSuffix: false });
         await blob.put(ARCHIVO_BLOB, texto, {
             access: "public",
             contentType: "application/json",
@@ -60,15 +93,25 @@ async function guardar(catalogo) {
             cacheControlMaxAge: 60,
             allowOverwrite: true
         });
+        await borrarVersionesViejas();
     } else {
         fs.writeFileSync(ARCHIVO_LOCAL, texto);
     }
     enMemoria = { catalogo, hora: Date.now() };
 }
 
+async function borrarVersionesViejas() {
+    try {
+        const viejas = (await listarVersiones()).slice(VERSIONES_GUARDADAS);
+        if (viejas.length) await blob.del(viejas.map((v) => v.url));
+    } catch (e) {
+        console.error("No se pudieron borrar versiones viejas del catálogo", e.message);
+    }
+}
+
 // Lee el catálogo más reciente, aplica el cambio y lo guarda
 async function modificar(cambio) {
-    const catalogo = await leerGuardado();
+    const catalogo = await leerActual();
     const resultado = cambio(catalogo);
     await guardar(catalogo);
     return resultado;
@@ -90,20 +133,4 @@ async function guardarImagen(buffer) {
     return "/img/subidas/" + nombre;
 }
 
-// Borra fotos subidas desde el panel que ya no usa ningún producto.
-// Las fotos originales de /img/ del proyecto nunca se borran.
-async function borrarImagenes(direcciones) {
-    for (const dir of direcciones) {
-        try {
-            if (USA_BLOB && /^https:\/\/[^/]+\.blob\.vercel-storage\.com\//.test(dir)) {
-                await blob.del(dir);
-            } else if (!USA_BLOB && dir.startsWith("/img/subidas/")) {
-                fs.rmSync(path.join(CARPETA_LOCAL, path.basename(dir)), { force: true });
-            }
-        } catch (e) {
-            console.error("No se pudo borrar la foto", dir, e.message);
-        }
-    }
-}
-
-module.exports = { leer, modificar, guardarImagen, borrarImagenes, USA_BLOB };
+module.exports = { leer, leerActual, modificar, guardarImagen, USA_BLOB };
