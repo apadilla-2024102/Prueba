@@ -31,26 +31,25 @@ function copiaInicial() {
     }));
 }
 
-// Devuelve { catalogo, version }. version sirve para no pisar cambios de otra persona.
-async function leerConVersion() {
+// Lee el catálogo guardado, sin pasar por la caché
+async function leerGuardado() {
     if (USA_BLOB) {
         const r = await blob.get(ARCHIVO_BLOB, { access: "public", useCache: false });
-        if (!r || r.statusCode !== 200) return { catalogo: copiaInicial(), version: null };
-        const texto = await new Response(r.stream).text();
-        return { catalogo: JSON.parse(texto), version: r.blob.etag };
+        if (!r || r.statusCode !== 200) return copiaInicial();
+        return JSON.parse(await new Response(r.stream).text());
     }
-    if (!fs.existsSync(ARCHIVO_LOCAL)) return { catalogo: copiaInicial(), version: null };
-    return { catalogo: JSON.parse(fs.readFileSync(ARCHIVO_LOCAL, "utf8")), version: null };
+    if (!fs.existsSync(ARCHIVO_LOCAL)) return copiaInicial();
+    return JSON.parse(fs.readFileSync(ARCHIVO_LOCAL, "utf8"));
 }
 
 async function leer() {
     if (enMemoria && Date.now() - enMemoria.hora < VIGENCIA_MS) return enMemoria.catalogo;
-    const { catalogo } = await leerConVersion();
+    const catalogo = await leerGuardado();
     enMemoria = { catalogo, hora: Date.now() };
     return catalogo;
 }
 
-async function guardar(catalogo, version) {
+async function guardar(catalogo) {
     catalogo.actualizado = new Date().toISOString().slice(0, 10);
     const texto = JSON.stringify(catalogo, null, 2);
     if (USA_BLOB) {
@@ -59,8 +58,7 @@ async function guardar(catalogo, version) {
             contentType: "application/json",
             addRandomSuffix: false,
             cacheControlMaxAge: 60,
-            // Si alguien más guardó mientras tanto, falla en vez de borrar su cambio
-            ...(version ? { ifMatch: version } : { allowOverwrite: true })
+            allowOverwrite: true
         });
     } else {
         fs.writeFileSync(ARCHIVO_LOCAL, texto);
@@ -68,19 +66,12 @@ async function guardar(catalogo, version) {
     enMemoria = { catalogo, hora: Date.now() };
 }
 
-// Lee el catálogo más reciente, aplica el cambio y lo guarda.
-// Si dos personas guardan a la vez, reintenta con la versión nueva.
+// Lee el catálogo más reciente, aplica el cambio y lo guarda
 async function modificar(cambio) {
-    for (let intento = 0; ; intento++) {
-        const { catalogo, version } = await leerConVersion();
-        const resultado = cambio(catalogo);
-        try {
-            await guardar(catalogo, version);
-            return resultado;
-        } catch (e) {
-            if (!(blob && e instanceof blob.BlobPreconditionFailedError) || intento >= 2) throw e;
-        }
-    }
+    const catalogo = await leerGuardado();
+    const resultado = cambio(catalogo);
+    await guardar(catalogo);
+    return resultado;
 }
 
 // Guarda una foto (JPEG ya reducida en el navegador) y devuelve su dirección.
