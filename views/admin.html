@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Panel | Drea Sparkle</title>
+    <meta name="theme-color" content="#2e1233">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body class="admin">
+    <!-- Entrar -->
+    <main class="entrar" id="pantalla-entrar" hidden>
+        <form class="entrar-tarjeta" id="form-entrar">
+            <p class="entrar-logo" aria-hidden="true"><span class="logo"><span class="logo-drea">Drea</span><span class="logo-sparkle">Sparkle<svg class="logo-destello" viewBox="0 0 24 24"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg></span></span></p>
+            <h1>Panel de administración</h1>
+            <label class="campo">
+                <span>Usuario</span>
+                <input name="usuario" autocomplete="username" autocapitalize="off" spellcheck="false" required>
+            </label>
+            <label class="campo">
+                <span>Contraseña</span>
+                <input name="clave" type="password" autocomplete="current-password" required>
+            </label>
+            <p class="mensaje-error" id="error-entrar" role="alert"></p>
+            <button class="boton boton-principal" type="submit">Entrar</button>
+        </form>
+    </main>
+
+    <!-- Panel -->
+    <div id="pantalla-panel" hidden>
+        <header class="barra">
+            <a href="/" class="marca" aria-label="Ver la tienda">
+                <span class="logo"><span class="logo-drea">Drea</span><span class="logo-sparkle">Sparkle<svg class="logo-destello" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg></span></span>
+            </a>
+            <div class="panel-usuario">
+                <span>Hola, <strong id="nombre-usuario"></strong></span>
+                <a href="/" target="_blank" rel="noopener">Ver tienda</a>
+                <button class="enlace" id="salir">Salir</button>
+            </div>
+        </header>
+
+        <main class="panel">
+            <p class="aviso-almacen" id="aviso-almacen" hidden>
+                Falta conectar <strong>Vercel Blob</strong> al proyecto. Sin eso los cambios no se pueden guardar en la página publicada.
+            </p>
+
+            <div class="panel-encabezado">
+                <div>
+                    <h1>Productos</h1>
+                    <p id="resumen"></p>
+                </div>
+                <button class="boton boton-principal" id="agregar">+ Agregar producto</button>
+            </div>
+
+            <div class="panel-filtros">
+                <label class="campo campo-buscar">
+                    <span class="visualmente-oculto">Buscar</span>
+                    <input type="search" id="buscar" placeholder="Buscar por nombre o marca">
+                </label>
+                <label class="campo">
+                    <span class="visualmente-oculto">Categoría</span>
+                    <select id="filtro-categoria"></select>
+                </label>
+            </div>
+
+            <ul class="lista" id="lista"></ul>
+        </main>
+    </div>
+
+    <!-- Editar o agregar producto -->
+    <dialog class="editor" id="editor" aria-labelledby="editor-titulo">
+        <form id="form-producto" novalidate>
+            <header class="editor-cabeza">
+                <h2 id="editor-titulo">Editar producto</h2>
+                <button type="button" class="cerrar" data-cerrar aria-label="Cerrar">&times;</button>
+            </header>
+
+            <div class="editor-cuerpo">
+                <fieldset class="fotos">
+                    <legend>Fotos <small>(hasta 3; la primera es la de la tarjeta)</small></legend>
+                    <div class="fotos-lista" id="fotos"></div>
+                    <input type="file" id="elegir-foto" accept="image/*" hidden>
+                </fieldset>
+
+                <label class="campo">
+                    <span>Nombre o título</span>
+                    <input name="nombre" maxlength="120" required>
+                </label>
+
+                <div class="campos-dos">
+                    <label class="campo">
+                        <span>Marca <small>(opcional)</small></span>
+                        <input name="marca" maxlength="60">
+                    </label>
+                    <label class="campo">
+                        <span>Categoría</span>
+                        <select name="categoria" id="editor-categoria" required></select>
+                    </label>
+                </div>
+
+                <label class="campo">
+                    <span>Descripción</span>
+                    <textarea name="desc" rows="3" maxlength="600"></textarea>
+                </label>
+
+                <div class="campos-dos">
+                    <label class="campo">
+                        <span>Precio en quetzales <small>(vacío = "Consultar precio")</small></span>
+                        <input name="precio" type="number" min="0" step="0.01" inputmode="decimal">
+                    </label>
+                    <label class="campo">
+                        <span>Piezas disponibles</span>
+                        <input name="cantidad" type="number" min="0" step="1" inputmode="numeric">
+                    </label>
+                </div>
+
+                <label class="casilla">
+                    <input type="checkbox" name="destacado">
+                    <span>Marcar como “Favorito”</span>
+                </label>
+
+                <fieldset class="specs-editor">
+                    <legend>Especificaciones <small>(por ejemplo: Contenido · 75 ml)</small></legend>
+                    <div id="specs"></div>
+                    <button type="button" class="boton boton-borde boton-chico" id="agregar-spec">+ Agregar especificación</button>
+                </fieldset>
+            </div>
+
+            <footer class="editor-pie">
+                <p class="mensaje-error" id="error-producto" role="alert"></p>
+                <button type="button" class="boton boton-borde" data-cerrar>Cancelar</button>
+                <button type="submit" class="boton boton-principal" id="guardar">Guardar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <!-- Confirmar eliminación -->
+    <dialog class="confirmar" id="confirmar" aria-labelledby="confirmar-titulo">
+        <h2 id="confirmar-titulo">¿Eliminar este producto?</h2>
+        <p id="confirmar-texto"></p>
+        <p class="mensaje-error" id="error-eliminar" role="alert"></p>
+        <div class="confirmar-acciones">
+            <button class="boton boton-borde" data-cerrar>Cancelar</button>
+            <button class="boton boton-peligro" id="confirmar-eliminar">Eliminar</button>
+        </div>
+    </dialog>
+
+    <p class="aviso-flotante" id="aviso" role="status" aria-live="polite"></p>
+
+    <script src="/admin/admin.js" defer></script>
+</body>
+</html>
