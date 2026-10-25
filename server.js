@@ -1,7 +1,8 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-const { categorias, productos, actualizado } = require("./data/productos");
+const almacen = require("./data/almacen");
+const admin = require("./admin");
 const plantillas = require("./public/plantillas");
 
 const app = express();
@@ -70,6 +71,7 @@ app.use((req, res, next) => {
 // CSS y JS se guardan un día y se revisan si cambiaron (ETag).
 app.use(express.static(path.join(__dirname, "public"), {
     index: false,
+    redirect: false,
     setHeaders(res, ruta) {
         if (/\.(jpe?g|png|webp|svg)$/i.test(ruta)) {
             res.set("Cache-Control", "public, max-age=604800, stale-while-revalidate=86400");
@@ -79,13 +81,17 @@ app.use(express.static(path.join(__dirname, "public"), {
     }
 }));
 
-app.get("/api/categorias", (req, res) => {
-    res.json(categorias);
+// Panel de administración oculto (/admin)
+app.use("/admin", admin);
+
+app.get("/api/categorias", async (req, res) => {
+    res.json((await almacen.leer()).categorias);
 });
 
 // Catálogo con precio en quetzales, aproximado en dólares y enlace de WhatsApp ya armado.
 // Se alternan los dos números para repartir los mensajes.
-function productosParaMostrar() {
+async function productosParaMostrar() {
+    const { productos } = await almacen.leer();
     return productos.map((p, i) => {
         const numero = NUMEROS[i % NUMEROS.length];
         const nombre = p.marca ? p.nombre + " (" + p.marca + ")" : p.nombre;
@@ -103,8 +109,8 @@ function productosParaMostrar() {
     });
 }
 
-app.get("/api/productos", (req, res) => {
-    res.json(productosParaMostrar());
+app.get("/api/productos", async (req, res) => {
+    res.json(await productosParaMostrar());
 });
 
 // Números de contacto con el mensaje de interés general.
@@ -121,6 +127,11 @@ const PLANTILLA = fs.readFileSync(path.join(__dirname, "views", "index.html"), "
 
 function urlBase(req) {
     return SITE_URL || req.protocol + "://" + req.get("host");
+}
+
+// Las fotos subidas desde el panel ya traen su dirección completa (Vercel Blob)
+function urlAbsoluta(base, img) {
+    return /^https?:\/\//.test(img) ? img : base + img;
 }
 
 // Datos estructurados (schema.org) que Google usa para entender la tienda y los productos.
@@ -154,7 +165,7 @@ function datosEstructurados(base, lista) {
                     name: p.nombre,
                     sku: "DS-" + p.id,
                     description: p.desc,
-                    image: p.imagenes.map((img) => base + img),
+                    image: p.imagenes.map((img) => urlAbsoluta(base, img)),
                     ...(p.marca ? { brand: { "@type": "Brand", name: p.marca } } : {}),
                     offers: {
                         "@type": "Offer",
@@ -222,9 +233,10 @@ function paginaHTML(base, { titulo, descripcion, ruta, contenido }) {
         .replace("<!--ANIO-->", String(new Date().getFullYear()));
 }
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
     const base = urlBase(req);
-    const lista = productosParaMostrar();
+    const { categorias } = await almacen.leer();
+    const lista = await productosParaMostrar();
     const html = PLANTILLA
         .replace("<!--SEO-->", etiquetasSEO(base, {
             titulo: "Drea Sparkle | Fragancias, skincare y joyería en Guatemala",
@@ -269,7 +281,8 @@ app.get("/robots.txt", (req, res) => {
     );
 });
 
-app.get("/sitemap.xml", (req, res) => {
+app.get("/sitemap.xml", async (req, res) => {
+    const { productos, actualizado } = await almacen.leer();
     const base = urlBase(req);
     const xml = (t) => plantillas.escapar(t);
     // Una sola página, con las fotos de los productos para Google Imágenes
@@ -280,7 +293,7 @@ app.get("/sitemap.xml", (req, res) => {
         "  <url>\n" +
         "    <loc>" + xml(base + "/") + "</loc>\n" +
         "    <lastmod>" + actualizado + "</lastmod>\n" +
-        imagenes.map((img) => "    <image:image><image:loc>" + xml(base + img) + "</image:loc></image:image>\n").join("") +
+        imagenes.map((img) => "    <image:image><image:loc>" + xml(urlAbsoluta(base, img)) + "</image:loc></image:image>\n").join("") +
         "  </url>\n" +
         "  <url>\n" +
         "    <loc>" + xml(base + "/privacidad") + "</loc>\n" +
@@ -291,7 +304,8 @@ app.get("/sitemap.xml", (req, res) => {
 });
 
 // ---------- Página no encontrada (404 personalizada) ----------
-app.use((req, res) => {
+app.use(async (req, res) => {
+    const { categorias } = await almacen.leer();
     const categoriasHTML = categorias.map((c) =>
         '<li><a href="/#productos"><img src="' + c.imagen + '" alt="" loading="lazy" width="300" height="400">' +
         plantillas.escapar(c.nombre) + '</a></li>'
