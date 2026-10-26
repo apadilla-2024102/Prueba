@@ -84,6 +84,11 @@ $("form-entrar").addEventListener("submit", async (e) => {
         await mostrarPanel(usuario);
     } catch (err) {
         $("error-entrar").textContent = err.message;
+        // La tarjeta se sacude un poco: un "no" que se entiende sin leer
+        const tarjeta = form.closest(".entrar-tarjeta") || form;
+        tarjeta.classList.remove("sacudir");
+        tarjeta.offsetWidth;
+        tarjeta.classList.add("sacudir");
     } finally {
         boton.disabled = false;
     }
@@ -275,15 +280,39 @@ $("fotos").addEventListener("click", (e) => {
         $("elegir-foto").click();
     }
     if (quitar) {
-        estado.fotos.splice(Number(quitar.dataset.quitar), 1);
-        pintarFotos();
+        moverFotos(() => estado.fotos.splice(Number(quitar.dataset.quitar), 1));
     }
     if (primera) {
-        const [foto] = estado.fotos.splice(Number(primera.dataset.primera), 1);
-        estado.fotos.unshift(foto);
-        pintarFotos();
+        moverFotos(() => {
+            const [foto] = estado.fotos.splice(Number(primera.dataset.primera), 1);
+            estado.fotos.unshift(foto);
+        });
     }
 });
+
+// Reordena las fotos y las desliza desde su lugar anterior al nuevo (técnica FLIP),
+// así se entiende a dónde fue cada una en vez de verlas saltar
+function moverFotos(cambio) {
+    const antes = new Map();
+    $("fotos").querySelectorAll(".foto img").forEach((img) => {
+        if (!antes.has(img.getAttribute("src"))) antes.set(img.getAttribute("src"), img.getBoundingClientRect());
+    });
+    cambio();
+    pintarFotos();
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    $("fotos").querySelectorAll(".foto img").forEach((img) => {
+        const previo = antes.get(img.getAttribute("src"));
+        if (!previo || !img.animate) return;
+        antes.delete(img.getAttribute("src"));
+        const ahora = img.getBoundingClientRect();
+        const dx = previo.left - ahora.left, dy = previo.top - ahora.top;
+        if (!dx && !dy) return;
+        img.animate(
+            [{ transform: "translate(" + dx + "px, " + dy + "px)" }, { transform: "none" }],
+            { duration: 320, easing: "cubic-bezier(0.77, 0, 0.175, 1)" }
+        );
+    });
+}
 
 // Achica la foto en el navegador antes de subirla (máximo 1600 px, JPEG)
 function achicarFoto(archivo) {
@@ -331,19 +360,26 @@ $("elegir-foto").addEventListener("change", async (e) => {
     pintarFotos();
 });
 
-function agregarSpec(nombre = "", valor = "") {
+// nueva: true cuando se agrega con el botón (solo entonces aparece con animación)
+function agregarSpec(nombre = "", valor = "", nueva = false) {
     const fila = document.createElement("div");
-    fila.className = "spec";
+    fila.className = "spec" + (nueva ? " spec-nueva" : "");
     fila.innerHTML =
         '<input aria-label="Nombre de la especificación" placeholder="Contenido" maxlength="40" value="' + escapar(nombre) + '">' +
         '<input aria-label="Valor" placeholder="75 ml" maxlength="200" value="' + escapar(valor) + '">' +
         '<button type="button" class="spec-quitar" aria-label="Quitar especificación">&times;</button>';
-    fila.querySelector("button").addEventListener("click", () => fila.remove());
+    // Al quitarla se desvanece rápido antes de salir
+    fila.querySelector("button").addEventListener("click", () => {
+        if (!fila.animate || matchMedia("(prefers-reduced-motion: reduce)").matches) return fila.remove();
+        fila.animate([{ opacity: 1 }, { opacity: 0, transform: "translateX(-8px)" }], { duration: 150, easing: "ease-out", fill: "forwards" });
+        // Se quita al terminar; el temporizador asegura que salga aunque la animación se cancele
+        setTimeout(() => fila.remove(), 160);
+    });
     $("specs").appendChild(fila);
 }
 
 $("agregar-spec").addEventListener("click", () => {
-    agregarSpec();
+    agregarSpec("", "", true);
     $("specs").lastElementChild.querySelector("input").focus();
 });
 

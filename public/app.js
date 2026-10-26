@@ -49,6 +49,64 @@ function aparecerAlCargar(imagenes) {
     });
 }
 
+// ---------- Barra con sombra al bajar ----------
+const barra = document.querySelector(".barra");
+let barraPendiente = false;
+window.addEventListener("scroll", () => {
+    if (barraPendiente) return;
+    barraPendiente = true;
+    requestAnimationFrame(() => {
+        barraPendiente = false;
+        barra.classList.toggle("con-sombra", window.scrollY > 8);
+    });
+}, { passive: true });
+
+// ---------- Portada: los arcos siguen el mouse con un resorte ----------
+// Decorativo, solo con mouse. Sin resorte, seguir el puntero se ve mecánico;
+// con resorte tiene inercia y se siente vivo (técnica de Emil Kowalski).
+(function () {
+    if (!matchMedia("(hover: hover) and (pointer: fine)").matches || pocoMovimiento.matches) return;
+    const portada = document.querySelector(".portada");
+    const capas = [
+        [".arco-grande", 10], [".arco-a", 22], [".arco-b", 16], [".arco-linea", 5]
+    ].map(([selector, fuerza]) => ({ el: document.querySelector(selector), fuerza })).filter((c) => c.el);
+    if (!portada || !capas.length) return;
+
+    const resorte = { x: 0, y: 0, vx: 0, vy: 0, metaX: 0, metaY: 0 };
+    const RIGIDEZ = 120, AMORTIGUACION = 16;
+    let corriendo = false, antes = 0;
+
+    function paso(ahora) {
+        const dt = Math.min((ahora - antes) / 1000, 0.05);
+        antes = ahora;
+        resorte.vx += ((resorte.metaX - resorte.x) * RIGIDEZ - resorte.vx * AMORTIGUACION) * dt;
+        resorte.vy += ((resorte.metaY - resorte.y) * RIGIDEZ - resorte.vy * AMORTIGUACION) * dt;
+        resorte.x += resorte.vx * dt;
+        resorte.y += resorte.vy * dt;
+        // translate (no transform) para sumarse a la animación de entrada sin pisarla
+        capas.forEach((c) => { c.el.style.translate = (resorte.x * c.fuerza).toFixed(2) + "px " + (resorte.y * c.fuerza).toFixed(2) + "px"; });
+        const quieto = Math.abs(resorte.metaX - resorte.x) < 0.001 && Math.abs(resorte.metaY - resorte.y) < 0.001 &&
+            Math.abs(resorte.vx) < 0.001 && Math.abs(resorte.vy) < 0.001;
+        if (quieto) corriendo = false; else requestAnimationFrame(paso);
+    }
+
+    function mover(x, y) {
+        resorte.metaX = x;
+        resorte.metaY = y;
+        if (!corriendo) {
+            corriendo = true;
+            antes = performance.now();
+            requestAnimationFrame(paso);
+        }
+    }
+
+    portada.addEventListener("pointermove", (e) => {
+        const r = portada.getBoundingClientRect();
+        mover((e.clientX - r.left) / r.width - 0.5, (e.clientY - r.top) / r.height - 0.5);
+    });
+    portada.addEventListener("pointerleave", () => mover(0, 0));
+})();
+
 // ---------- Categorías y filtros ----------
 function pintarCategorias() {
     document.getElementById("categorias").innerHTML = estado.categorias.map(categoriaHTML).join("");
