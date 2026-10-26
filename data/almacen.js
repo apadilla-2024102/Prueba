@@ -9,10 +9,11 @@
 // La primera vez se parte del catálogo escrito en data/productos.js.
 //
 // Ojo: un archivo público que se sobrescribe en Blob puede seguir leyéndose viejo
-// hasta 60 segundos. Por eso cada cambio se guarda como una versión nueva con
-// nombre propio (catalogo/v-....json), que nunca está vieja, y el panel siempre
-// trabaja sobre la versión más reciente. Se conservan las últimas versiones como respaldo.
-// catalogo.json se sobrescribe también, solo para que la tienda lo lea rápido.
+// hasta 60 segundos (useCache: false solo sirve para archivos privados). Por eso cada
+// cambio se guarda como una versión nueva con nombre propio (catalogo/v-....json),
+// que nunca está vieja, y tanto el panel como la tienda leen la más reciente.
+// Se conservan las últimas versiones como respaldo.
+// catalogo.json se sobrescribe también, solo como respaldo si no se pueden listar las versiones.
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
@@ -28,7 +29,7 @@ const ARCHIVO_LOCAL = path.join(__dirname, "catalogo.json");
 const CARPETA_LOCAL = path.join(__dirname, "..", "public", "img", "subidas");
 
 // El sitio público lee el catálogo muchas veces: se guarda en memoria unos segundos.
-const VIGENCIA_MS = 15 * 1000;
+const VIGENCIA_MS = 5 * 1000;
 let enMemoria = null;
 
 function copiaInicial() {
@@ -69,12 +70,18 @@ async function leerActual() {
     return JSON.parse(fs.readFileSync(ARCHIVO_LOCAL, "utf8"));
 }
 
-// Para la tienda: catalogo.json (puede tardar hasta un minuto en mostrar un cambio)
+// Para la tienda: la versión más reciente, guardada en memoria unos segundos
 async function leer() {
     if (enMemoria && Date.now() - enMemoria.hora < VIGENCIA_MS) return enMemoria.catalogo;
-    const catalogo = USA_BLOB
-        ? (await leerBlob(ARCHIVO_BLOB)) || copiaInicial()
-        : await leerActual();
+    let catalogo;
+    try {
+        catalogo = await leerActual();
+    } catch (e) {
+        // Si Blob falla, mejor mostrar lo último que se tenga que dejar la tienda vacía
+        console.error("No se pudo leer la versión más reciente del catálogo", e.message);
+        if (enMemoria) return enMemoria.catalogo;
+        catalogo = (USA_BLOB && (await leerBlob(ARCHIVO_BLOB).catch(() => null))) || copiaInicial();
+    }
     enMemoria = { catalogo, hora: Date.now() };
     return catalogo;
 }
