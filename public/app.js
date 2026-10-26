@@ -23,9 +23,36 @@ function revelarAlBajar(elementos) {
     });
 }
 
+// ---------- Detalles que evitan cambios bruscos ----------
+const pocoMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+// Cambia un texto con un fundido y un leve desenfoque: el desenfoque une el texto viejo
+// y el nuevo en uno solo, en vez de verse dos textos encimados
+function cambiarTexto(el, texto) {
+    if (el.textContent === texto) return;
+    el.textContent = texto;
+    if (pocoMovimiento.matches || !el.animate) return;
+    el.animate(
+        [{ opacity: 0.4, filter: "blur(3px)" }, { opacity: 1, filter: "blur(0)" }],
+        { duration: 200, easing: "ease-out" }
+    );
+}
+
+// Las fotos que todavía no terminan de bajar aparecen con un fundido al llegar
+function aparecerAlCargar(imagenes) {
+    imagenes.forEach((img) => {
+        if (img.complete) return;
+        img.classList.add("cargando");
+        const listo = () => img.classList.remove("cargando");
+        img.addEventListener("load", listo, { once: true });
+        img.addEventListener("error", listo, { once: true });
+    });
+}
+
 // ---------- Categorías y filtros ----------
 function pintarCategorias() {
     document.getElementById("categorias").innerHTML = estado.categorias.map(categoriaHTML).join("");
+    aparecerAlCargar(document.querySelectorAll("#categorias img"));
 
     const contar = (id) => estado.productos.filter((p) => p.categoria === id).length;
     const filtros = [{ id: "todos", nombre: "Todos", total: estado.productos.length }]
@@ -99,8 +126,9 @@ function pintarProductos() {
         : estado.productos.filter((p) => p.categoria === estado.categoria));
 
     const categoria = estado.categorias.find((c) => c.id === estado.categoria);
-    document.getElementById("contador").textContent = contadorTexto(lista.length, categoria);
+    cambiarTexto(document.getElementById("contador"), contadorTexto(lista.length, categoria));
     document.getElementById("rejilla").innerHTML = lista.map(tarjetaHTML).join("");
+    aparecerAlCargar(document.querySelectorAll("#rejilla img"));
 
     document.querySelectorAll("[data-detalle]").forEach((b) => {
         b.addEventListener("click", () => abrirDetalle(Number(b.dataset.detalle)));

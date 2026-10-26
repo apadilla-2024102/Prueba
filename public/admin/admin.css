@@ -295,7 +295,7 @@ legend { padding: 0; margin-bottom: 10px; font-size: .88rem; font-weight: 600; }
     z-index: 60;
 }
 
-.aviso-flotante.visible { opacity: 1; transform: translate(-50%, 0); }
+.aviso-flotante.visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
 
 /* ---------- Celular ---------- */
 @media (max-width: 640px) {
@@ -339,3 +339,36 @@ legend { padding: 0; margin-bottom: 10px; font-size: .88rem; font-weight: 600; }
 /* Producto recién guardado: se ilumina y vuelve a su color poco a poco */
 .fila { transition: background-color 1.4s ease, border-color 1.4s ease; }
 .fila.recien { background: var(--rubor); border-color: var(--frambuesa); transition-duration: 0s; }
+
+/* Mantener presionado para eliminar: el relleno rojo avanza lento y lineal al presionar
+   (la persona está decidiendo) y se vacía rápido al soltar (la página responde) */
+.mantener {
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+}
+
+.mantener-relleno {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: #b3261e;
+    color: #fff;
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 200ms var(--ease-out);
+    pointer-events: none;
+}
+
+.mantener.presionando { transform: scale(.97); }
+.mantener.presionando .mantener-relleno,
+.mantener.listo .mantener-relleno { clip-path: inset(0 0 0 0); transition: clip-path 1.5s linear; }
+.mantener.listo .mantener-relleno { transition-duration: 0s; }
+
+/* El relleno muestra cuánto falta: es información, no adorno, así que se queda con movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    .mantener-relleno { transition-property: clip-path !important; }
+}

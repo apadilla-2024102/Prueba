@@ -19,13 +19,42 @@ async function api(ruta, opciones = {}) {
     return datos;
 }
 
-let temporizadorAviso;
+// El aviso se queda quieto mientras el mouse está encima o la pestaña está oculta
+// (como Sonner): así nunca desaparece sin que se haya podido leer.
+const temporizadorAviso = { id: null, restante: 0, desde: 0 };
+
+function correrAviso() {
+    clearTimeout(temporizadorAviso.id);
+    temporizadorAviso.desde = Date.now();
+    temporizadorAviso.id = setTimeout(() => $("aviso").classList.remove("visible"), temporizadorAviso.restante);
+}
+
+function pausarAviso() {
+    if (!$("aviso").classList.contains("visible")) return;
+    clearTimeout(temporizadorAviso.id);
+    temporizadorAviso.restante -= Date.now() - temporizadorAviso.desde;
+}
+
 function avisar(texto) {
     const aviso = $("aviso");
     aviso.textContent = texto;
     aviso.classList.add("visible");
-    clearTimeout(temporizadorAviso);
-    temporizadorAviso = setTimeout(() => aviso.classList.remove("visible"), 3000);
+    temporizadorAviso.restante = 3000;
+    correrAviso();
+}
+
+$("aviso").addEventListener("pointerenter", pausarAviso);
+$("aviso").addEventListener("pointerleave", () => { if ($("aviso").classList.contains("visible")) correrAviso(); });
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) pausarAviso();
+    else if ($("aviso").classList.contains("visible")) correrAviso();
+});
+
+// Cambia el texto de un botón con un leve desenfoque: une el texto viejo y el nuevo
+function cambiarTexto(el, texto) {
+    el.textContent = texto;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches || !el.animate) return;
+    el.animate([{ opacity: 0.6, filter: "blur(2px)" }, { opacity: 1, filter: "blur(0)" }], { duration: 200, easing: "ease-out" });
 }
 
 // ---------- Entrar y salir ----------
@@ -124,7 +153,9 @@ function pintarLista() {
             "</div>" +
             '<div class="fila-acciones">' +
                 '<button class="boton boton-borde boton-chico" data-editar="' + p.id + '">Editar</button>' +
-                '<button class="boton boton-peligro-borde boton-chico" data-eliminar="' + p.id + '">Eliminar</button>' +
+                '<button class="boton boton-peligro-borde boton-chico mantener" data-eliminar="' + p.id + '" title="Mantén presionado para eliminar">' +
+                    '<span class="mantener-relleno" aria-hidden="true">Eliminar</span>Eliminar' +
+                '</button>' +
             "</div>" +
         "</li>"
     ).join("") : '<li class="lista-vacia">No hay productos con ese filtro.</li>';
@@ -137,7 +168,48 @@ $("lista").addEventListener("click", (e) => {
     const editar = e.target.closest("[data-editar]");
     const eliminar = e.target.closest("[data-eliminar]");
     if (editar) abrirEditor(estado.productos.find((p) => p.id === Number(editar.dataset.editar)));
-    if (eliminar) pedirConfirmacion(estado.productos.find((p) => p.id === Number(eliminar.dataset.eliminar)));
+    // Con el teclado (detail 0) se pide confirmación; con mouse o dedo se mantiene presionado
+    if (eliminar && e.detail === 0) pedirConfirmacion(estado.productos.find((p) => p.id === Number(eliminar.dataset.eliminar)));
+});
+
+// ---------- Mantener presionado para eliminar ----------
+// Patrón de Emil Kowalski: al presionar, el botón se llena de rojo en 1.5 s (lento y lineal:
+// la persona está decidiendo); al soltar antes, se vacía rápido (200 ms) y no pasa nada.
+const MANTENER_MS = 1500;
+let mantenido = null;
+
+$("lista").addEventListener("pointerdown", (e) => {
+    const boton = e.target.closest("[data-eliminar]");
+    if (!boton || e.button !== 0 || mantenido) return;
+    boton.setPointerCapture(e.pointerId);
+    boton.classList.add("presionando");
+    mantenido = {
+        boton,
+        inicio: Date.now(),
+        temporizador: setTimeout(() => {
+            mantenido = null;
+            boton.classList.remove("presionando");
+            boton.classList.add("listo");
+            eliminarProducto(Number(boton.dataset.eliminar)).catch((err) => {
+                boton.classList.remove("listo");
+                avisar(err.message);
+            });
+        }, MANTENER_MS)
+    };
+});
+
+function soltar() {
+    if (!mantenido) return;
+    clearTimeout(mantenido.temporizador);
+    mantenido.boton.classList.remove("presionando");
+    if (Date.now() - mantenido.inicio < 300) avisar("Mantén presionado “Eliminar” para borrar el producto");
+    mantenido = null;
+}
+
+["pointerup", "pointercancel", "lostpointercapture"].forEach((tipo) => $("lista").addEventListener(tipo, soltar));
+// En celular, mantener presionado no debe abrir el menú del navegador
+$("lista").addEventListener("contextmenu", (e) => {
+    if (e.target.closest("[data-eliminar]")) e.preventDefault();
 });
 
 $("agregar").addEventListener("click", () => abrirEditor(null));
@@ -299,7 +371,7 @@ form.addEventListener("submit", async (e) => {
     };
     const boton = $("guardar");
     boton.disabled = true;
-    boton.textContent = "Guardando…";
+    cambiarTexto(boton, "Guardando…");
     try {
         const guardado = estado.editando
             ? await api("/productos/" + estado.editando.id, { method: "PUT", datos })
@@ -312,7 +384,7 @@ form.addEventListener("submit", async (e) => {
         $("error-producto").textContent = err.message;
     } finally {
         boton.disabled = false;
-        boton.textContent = "Guardar";
+        cambiarTexto(boton, "Guardar");
     }
 });
 
@@ -356,15 +428,20 @@ function pedirConfirmacion(producto) {
     confirmar.showModal();
 }
 
+// alBorrar se llama apenas el servidor confirma (por ejemplo, para cerrar la ventana)
+async function eliminarProducto(id, alBorrar) {
+    await api("/productos/" + id, { method: "DELETE" });
+    if (alBorrar) alBorrar();
+    avisar("Producto eliminado");
+    await quitarFila(id);
+    await cargarCatalogo();
+}
+
 $("confirmar-eliminar").addEventListener("click", async () => {
     const boton = $("confirmar-eliminar");
     boton.disabled = true;
     try {
-        await api("/productos/" + porEliminar.id, { method: "DELETE" });
-        confirmar.close();
-        avisar("Producto eliminado");
-        await quitarFila(porEliminar.id);
-        await cargarCatalogo();
+        await eliminarProducto(porEliminar.id, () => confirmar.close());
     } catch (err) {
         $("error-eliminar").textContent = err.message;
     } finally {
