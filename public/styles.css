@@ -14,6 +14,11 @@
     --serif: "Cormorant Garamond", "Georgia", serif;
     --sans: "Montserrat", "Helvetica Neue", Arial, sans-serif;
 
+    /* Curvas de movimiento (Emil Kowalski): más firmes que las del navegador */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
     --ancho: 1180px;
     --margen: clamp(16px, 4vw, 40px);
 }
@@ -86,8 +91,11 @@ a { color: inherit; }
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
-    transition: background-color .2s, color .2s, border-color .2s;
+    transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform 160ms var(--ease-out);
 }
+
+/* Todo lo que se presiona se hunde un poco: confirma que la página escuchó */
+.boton:active, .filtro:active, .cerrar:active, .enlace:active { transform: scale(.97); }
 
 .boton-principal { background: var(--frambuesa); color: #fff; }
 .boton-principal:hover { background: var(--frambuesa-oscura); }
@@ -216,15 +224,15 @@ a { color: inherit; }
     border-radius: 999px 999px 18px 18px;
     background: var(--lila);
     box-shadow: 0 30px 60px -30px rgba(46, 18, 51, .45);
-    animation: subir .9s cubic-bezier(.2, .7, .2, 1) both;
+    animation: descubrir 1.1s var(--ease-out) backwards;
 }
 
-.arco img { width: 100%; height: 100%; object-fit: cover; }
+.arco img { width: 100%; height: 100%; object-fit: cover; animation: acercar 1.6s var(--ease-out) backwards; animation-delay: inherit; }
 
-.arco-grande { left: 22%; top: 0; width: 52%; height: 88%; animation-delay: .1s; }
+.arco-grande { left: 22%; top: 0; width: 52%; height: 88%; animation-delay: .15s; }
 .arco-grande img { object-position: 40% center; }
 .arco-a { left: 0; bottom: 4%; width: 34%; height: 52%; animation-delay: .3s; }
-.arco-b { right: 0; top: 22%; width: 30%; height: 46%; animation-delay: .45s; }
+.arco-b { right: 0; top: 22%; width: 30%; height: 46%; animation-delay: .4s; }
 .arco-b img { object-position: 30% center; }
 
 .arco-linea {
@@ -236,15 +244,27 @@ a { color: inherit; }
     border: 1.5px solid var(--oro);
     border-radius: 999px 999px 18px 18px;
     z-index: -1;
-    animation: aparecer 1.2s .6s ease both;
+    animation: aparecer 1.2s .7s ease backwards;
 }
+
+/* Texto de la portada: aparece escalonado */
+.portada-texto > * { animation: subir .8s var(--ease-out) backwards; }
+.portada-texto > :nth-child(1) { animation-delay: .05s; }
+.portada-texto > :nth-child(2) { animation-delay: .15s; }
+.portada-texto > :nth-child(3) { animation-delay: .25s; }
 
 @keyframes subir {
-    from { opacity: 0; transform: translateY(40px); }
-    to { opacity: 1; transform: none; }
+    from { opacity: 0; transform: translateY(16px); }
 }
 
-@keyframes aparecer { from { opacity: 0; } to { opacity: 1; } }
+@keyframes descubrir {
+    from { clip-path: inset(100% 0 0 0 round 999px 999px 18px 18px); transform: translateY(24px); }
+    to { clip-path: inset(0 0 0 0 round 999px 999px 18px 18px); }
+}
+
+@keyframes acercar { from { transform: scale(1.15); } }
+
+@keyframes aparecer { from { opacity: 0; } }
 
 /* ---------- Categorías ---------- */
 .categorias {
@@ -283,12 +303,17 @@ a { color: inherit; }
     margin-bottom: 10px;
     outline: 1.5px solid transparent;
     outline-offset: 4px;
-    transition: outline-color .2s;
+    transition: outline-color .2s ease;
 }
 
-.categoria-foto img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+.categoria { transition: transform 160ms var(--ease-out); }
+.categoria:active { transform: scale(.97); }
 
-.categoria:hover .categoria-foto img { transform: scale(1.05); }
+.categoria-foto img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease-out); }
+
+@media (hover: hover) and (pointer: fine) {
+    .categoria:hover .categoria-foto img { transform: scale(1.05); }
+}
 .categoria[aria-pressed="true"] .categoria-foto { outline-color: var(--frambuesa); }
 
 /* ---------- Catálogo ---------- */
@@ -333,7 +358,7 @@ a { color: inherit; }
     font-size: .88rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color .2s, color .2s, border-color .2s;
+    transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform 160ms var(--ease-out);
 }
 
 .filtro:hover { border-color: var(--tinta); }
@@ -370,8 +395,13 @@ a { color: inherit; }
     background: var(--lila);
 }
 
-.producto-foto img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
-.producto-foto:hover img { transform: scale(1.04); }
+.producto-foto { transition: transform 160ms var(--ease-out); }
+.producto-foto:active { transform: scale(.98); }
+.producto-foto img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease-out); }
+
+@media (hover: hover) and (pointer: fine) {
+    .producto-foto:hover img { transform: scale(1.04); }
+}
 
 .producto-sello {
     position: absolute;
@@ -656,6 +686,7 @@ a { color: inherit; }
 
 /* ---------- Aviso de cookies ---------- */
 .aviso-cookies {
+    transition: opacity .4s ease, transform .4s var(--ease-drawer);
     position: fixed;
     left: 18px;
     right: 18px;
@@ -675,6 +706,18 @@ a { color: inherit; }
     color: var(--texto-suave);
 }
 
+/* Entra desde abajo con curva de cajón; sale más rápido */
+@starting-style {
+    .aviso-cookies { opacity: 0; transform: translateY(100%); }
+}
+
+.aviso-cookies.saliendo {
+    opacity: 0;
+    transform: translateY(16px);
+    transition-duration: 160ms;
+    transition-timing-function: ease, var(--ease-out);
+}
+
 .aviso-cookies a { color: var(--frambuesa); font-weight: 600; }
 .aviso-cookies .boton { flex-shrink: 0; min-height: 44px; padding: 10px 22px; }
 
@@ -688,13 +731,37 @@ dialog {
     box-shadow: 0 40px 80px -20px rgba(46, 18, 51, .5);
 }
 
-dialog::backdrop { background: rgba(46, 18, 51, .55); backdrop-filter: blur(2px); }
+/* Las ventanas entran en 280 ms y salen más rápido (150 ms). Nunca desde scale(0). */
+dialog {
+    opacity: 0;
+    transform: translateY(12px) scale(.97);
+    transition: opacity 150ms ease, transform 150ms var(--ease-out), overlay 150ms allow-discrete, display 150ms allow-discrete;
+}
 
-dialog[open] { animation: abrir .3s cubic-bezier(.2, .7, .2, 1); }
+dialog[open] {
+    opacity: 1;
+    transform: none;
+    transition-duration: 280ms;
+}
 
-@keyframes abrir {
-    from { opacity: 0; transform: translateY(16px) scale(.98); }
-    to { opacity: 1; transform: none; }
+@starting-style {
+    dialog[open] { opacity: 0; transform: translateY(12px) scale(.97); }
+}
+
+dialog::backdrop {
+    background: rgba(46, 18, 51, 0);
+    backdrop-filter: blur(0);
+    transition: background-color 150ms ease, backdrop-filter 150ms ease, overlay 150ms allow-discrete, display 150ms allow-discrete;
+}
+
+dialog[open]::backdrop {
+    background: rgba(46, 18, 51, .55);
+    backdrop-filter: blur(2px);
+    transition-duration: 280ms;
+}
+
+@starting-style {
+    dialog[open]::backdrop { background: rgba(46, 18, 51, 0); backdrop-filter: blur(0); }
 }
 
 .cerrar {
@@ -711,6 +778,7 @@ dialog[open] { animation: abrir .3s cubic-bezier(.2, .7, .2, 1); }
     line-height: 1;
     cursor: pointer;
     z-index: 2;
+    transition: background-color .2s ease, transform 160ms var(--ease-out);
 }
 
 .cerrar:hover { background: var(--rubor); }
@@ -771,9 +839,11 @@ dialog[open] { animation: abrir .3s cubic-bezier(.2, .7, .2, 1); }
     place-items: center;
     cursor: pointer;
     box-shadow: 0 6px 16px -6px rgba(46, 18, 51, .4);
+    transition: background-color .2s ease, transform 160ms var(--ease-out);
 }
 
 .galeria-flecha:hover { background: #fff; }
+.galeria-flecha:active { transform: translateY(-50%) scale(.92); }
 .galeria-flecha svg { width: 20px; height: 20px; fill: none; stroke: var(--tinta); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .galeria-anterior { left: 12px; }
 .galeria-siguiente { right: 12px; }
@@ -808,8 +878,10 @@ dialog[open] { animation: abrir .3s cubic-bezier(.2, .7, .2, 1); }
     overflow: hidden;
     cursor: pointer;
     opacity: .7;
-    transition: opacity .2s, border-color .2s;
+    transition: opacity .2s ease, border-color .2s ease, transform 160ms var(--ease-out);
 }
+
+.detalle-miniaturas button:active { transform: scale(.95); }
 
 .detalle-miniaturas button:hover { opacity: 1; }
 .detalle-miniaturas button[aria-current="true"] { border-color: var(--frambuesa); opacity: 1; }
@@ -865,7 +937,27 @@ dialog[open] { animation: abrir .3s cubic-bezier(.2, .7, .2, 1); }
     place-items: center;
     box-shadow: 0 10px 24px -6px rgba(37, 211, 102, .6);
     z-index: 30;
+    animation: llegar .5s var(--ease-out) 1s backwards;
+    transition: transform 160ms var(--ease-out);
 }
+
+.wa-fijo:active { transform: scale(.94); }
+
+@keyframes llegar { from { opacity: 0; transform: translateY(12px) scale(.9); } }
+
+/* ---------- Aparecer al bajar (lo activa app.js solo en lo que está fuera de pantalla) ---------- */
+.revelar {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity .6s var(--ease-out), transform .6s var(--ease-out);
+    transition-delay: calc(var(--orden, 0) * 50ms);
+}
+
+.revelar.visible { opacity: 1; transform: none; }
+
+/* Cambio de foto en la galería: fundido con un leve desenfoque para que no se vean dos fotos */
+.detalle-escenario > img { transition: opacity 220ms ease, filter 220ms ease; }
+.detalle-escenario > img.cambiando { opacity: .5; filter: blur(6px); transition-duration: 0ms; }
 
 .wa-fijo svg { width: 30px; height: 30px; fill: #fff; }
 
@@ -913,10 +1005,13 @@ dialog[open] { animation: abrir .3s cubic-bezier(.2, .7, .2, 1); }
     .aviso-cookies { flex-direction: column; align-items: stretch; left: 12px; right: 12px; bottom: 12px; }
 }
 
+/* Movimiento reducido: sin desplazamientos ni zoom; se quedan los fundidos que ayudan a entender */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation: none !important;
-        transition: none !important;
+        transition-property: opacity, background-color, color, border-color, outline-color !important;
     }
     html { scroll-behavior: auto; }
+    dialog, .revelar, .aviso-cookies { transform: none !important; }
+    .boton:active, .filtro:active, .categoria:active, .producto-foto:active, .wa-fijo:active { transform: none; }
 }

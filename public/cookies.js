@@ -20,8 +20,12 @@
 
     aviso.querySelector("button").addEventListener("click", () => {
         try { localStorage.setItem(CLAVE, "1"); } catch (e) { /* sin almacenamiento */ }
-        aviso.remove();
+        // Sale con una transición corta; si no hay transición, se quita igual
+        aviso.classList.add("saliendo");
+        aviso.addEventListener("transitionend", () => aviso.remove(), { once: true });
+        setTimeout(() => aviso.remove(), 300);
     });
 
-    document.body.appendChild(aviso);
+    // Espera un momento para no competir con la portada
+    setTimeout(() => document.body.appendChild(aviso), 600);
 })();
