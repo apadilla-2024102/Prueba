@@ -337,6 +337,7 @@ a { color: inherit; }
 .catalogo-encabezado p { color: var(--texto-suave); font-size: .95rem; }
 
 .filtros {
+    position: relative;
     display: flex;
     gap: 10px;
     overflow-x: auto;
@@ -371,6 +372,27 @@ a { color: inherit; }
 
 .filtro span { color: var(--oro); margin-left: 6px; font-weight: 600; }
 .filtro[aria-pressed="true"] span { color: #e9cf8f; }
+
+/* Filtro activo con la técnica de Emil: una copia oscura de la fila, recortada
+   (clip-path) para mostrar solo el filtro elegido. Al cambiar, el recorte se desliza
+   y el color cambia de forma continua, sin saltos. Lo arma app.js. */
+.filtros-activo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    gap: 10px;
+    width: max-content;
+    padding: 20px 0 6px;
+    pointer-events: none;
+    transition: clip-path 260ms var(--ease-out);
+}
+
+.filtros-activo .filtro { background: var(--tinta); border-color: var(--tinta); color: #fff; }
+.filtros-activo .filtro span { color: #e9cf8f; }
+
+.con-indicador .filtro[aria-pressed="true"] { background: var(--superficie); border-color: var(--lila); color: var(--tinta); }
+.con-indicador .filtro[aria-pressed="true"] span { color: var(--oro); }
 
 .contador { margin: 8px 0 22px; font-size: .85rem; color: var(--texto-suave); }
 
@@ -955,6 +977,17 @@ dialog[open]::backdrop {
 
 .revelar.visible { opacity: 1; transform: none; }
 
+/* Fotos de producto: se descubren de arriba hacia abajo con un leve acercamiento */
+/* (el estado oculto va con :not(.visible) para no tapar el zoom al pasar el mouse después) */
+.producto.revelar .producto-foto {
+    clip-path: inset(0 0 0 0 round 14px);
+    transition: clip-path .9s var(--ease-out), transform 160ms var(--ease-out);
+    transition-delay: calc(var(--orden, 0) * 50ms), 0s;
+}
+
+.producto.revelar:not(.visible) .producto-foto { clip-path: inset(0 0 100% 0 round 14px); }
+.producto.revelar:not(.visible) .producto-foto img { transform: scale(1.12); }
+
 /* Cambio de foto en la galería: fundido con un leve desenfoque para que no se vean dos fotos */
 .detalle-escenario > img { transition: opacity 220ms ease, filter 220ms ease; }
 .detalle-escenario > img.cambiando { opacity: .5; filter: blur(6px); transition-duration: 0ms; }
@@ -975,6 +1008,34 @@ dialog[open]::backdrop {
         border-radius: 0;
     }
     .detalle[open] { display: block; }
+
+    /* En celular el detalle es una hoja que sube desde abajo (curva de cajón) y baja más rápido */
+    .detalle {
+        opacity: 1;
+        transform: translateY(100%);
+        transition: transform 240ms var(--ease-out), overlay 240ms allow-discrete, display 240ms allow-discrete;
+    }
+
+    .detalle[open] { transform: none; transition-duration: 420ms; transition-timing-function: var(--ease-drawer); }
+
+    @starting-style {
+        .detalle[open] { opacity: 1; transform: translateY(100%); }
+    }
+
+    /* Asa para indicar que se puede bajar para cerrar */
+    .detalle::before {
+        content: "";
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        width: 40px;
+        height: 4px;
+        margin-left: -20px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, .85);
+        box-shadow: 0 1px 4px rgba(46, 18, 51, .3);
+        z-index: 3;
+    }
     .detalle-galeria { position: static; }
     .detalle-info { padding: 22px 20px 0; }
     .specs div { grid-template-columns: 6.5rem 1fr; }
