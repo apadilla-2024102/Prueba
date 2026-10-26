@@ -213,7 +213,9 @@ legend { padding: 0; margin-bottom: 10px; font-size: .88rem; font-weight: 600; }
 }
 
 .foto-vacia span { font-size: 1.8rem; line-height: 1; color: var(--frambuesa); }
+.foto-vacia { transition: border-color .2s ease, background-color .2s ease, transform 160ms var(--ease-out); }
 .foto-vacia:hover { border-color: var(--frambuesa); background: var(--rubor); }
+.foto-vacia:active, .foto-acciones button:active, .spec-quitar:active { transform: scale(.95); }
 
 .foto-subiendo { display: grid; place-items: center; font-size: .85rem; color: var(--texto-suave); animation: latir 1.2s ease-in-out infinite; }
 
@@ -251,6 +253,7 @@ legend { padding: 0; margin-bottom: 10px; font-size: .88rem; font-weight: 600; }
     cursor: pointer;
 }
 
+.foto-acciones button { transition: background-color .2s ease, transform 160ms var(--ease-out); }
 .foto-acciones button:hover { background: #fff; }
 
 /* Especificaciones */
@@ -266,6 +269,7 @@ legend { padding: 0; margin-bottom: 10px; font-size: .88rem; font-weight: 600; }
     cursor: pointer;
 }
 
+.spec-quitar { transition: background-color .2s ease, color .2s ease, transform 160ms var(--ease-out); }
 .spec-quitar:hover { background: #fbeceb; color: #b3261e; }
 
 /* ---------- Confirmar ---------- */
@@ -287,7 +291,7 @@ legend { padding: 0; margin-bottom: 10px; font-size: .88rem; font-weight: 600; }
     font-size: .9rem;
     opacity: 0;
     pointer-events: none;
-    transition: opacity .2s, transform .2s;
+    transition: opacity .2s ease, transform .3s var(--ease-out);
     z-index: 60;
 }
 
@@ -317,3 +321,12 @@ legend { padding: 0; margin-bottom: 10px; font-size: .88rem; font-weight: 600; }
     .foto-subiendo { min-height: 76px; display: grid; grid-template-columns: 1fr; }
     .spec { grid-template-columns: 1fr 1fr 40px; }
 }
+
+/* ---------- Movimiento ---------- */
+/* Al entrar al panel, las primeras filas aparecen escalonadas (solo la primera vez) */
+.lista.entrando .fila { animation: fila-entra .4s var(--ease-out) backwards; animation-delay: calc(var(--orden, 0) * 35ms); }
+
+@keyframes fila-entra { from { opacity: 0; transform: translateY(8px); } }
+
+/* La tarjeta de entrar aparece suave al abrir la página */
+.entrar-tarjeta { animation: fila-entra .5s var(--ease-out) backwards; }

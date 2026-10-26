@@ -1,6 +1,28 @@
 const estado = { categoria: "todos", categorias: [], productos: [] };
 const { escapar, precioHTML, sinFotoHTML, textoBoton, ordenar, tarjetaHTML, categoriaHTML, contadorTexto } = window.Plantillas;
 
+// ---------- Aparecer al bajar ----------
+// Solo se esconde lo que todavía está fuera de pantalla, así nada parpadea al cargar.
+// Lo que entra junto aparece escalonado (50 ms entre cada uno).
+const revelador = "IntersectionObserver" in window
+    ? new IntersectionObserver((entradas) => {
+        entradas.filter((e) => e.isIntersecting).forEach((e, i) => {
+            e.target.style.setProperty("--orden", Math.min(i, 8));
+            e.target.classList.add("visible");
+            revelador.unobserve(e.target);
+        });
+    }, { threshold: 0.15 })
+    : null;
+
+function revelarAlBajar(elementos) {
+    if (!revelador) return;
+    elementos.forEach((el) => {
+        if (el.getBoundingClientRect().top < window.innerHeight) return;
+        el.classList.add("revelar");
+        revelador.observe(el);
+    });
+}
+
 // ---------- Categorías y filtros ----------
 function pintarCategorias() {
     document.getElementById("categorias").innerHTML = estado.categorias.map(categoriaHTML).join("");
@@ -37,6 +59,9 @@ function filtrar(id) {
 }
 
 // ---------- Productos ----------
+// Las tarjetas aparecen al bajar solo la primera vez; al filtrar se muestran al instante
+let primeraVez = true;
+
 function pintarProductos() {
     const lista = ordenar(estado.categoria === "todos"
         ? estado.productos
@@ -49,17 +74,29 @@ function pintarProductos() {
     document.querySelectorAll("[data-detalle]").forEach((b) => {
         b.addEventListener("click", () => abrirDetalle(Number(b.dataset.detalle)));
     });
+
+    if (primeraVez) {
+        primeraVez = false;
+        revelarAlBajar(document.querySelectorAll("#rejilla .producto"));
+    }
 }
 
 // ---------- Detalle del producto ----------
 const detalle = document.getElementById("detalle");
 const galeria = { fotos: [], actual: 0, nombre: "" };
 
-function verFoto(i) {
+// animar: false con el teclado (se repite mucho y la animación lo haría sentir lento)
+function verFoto(i, animar = true) {
     const total = galeria.fotos.length;
     if (!total) return;
+    const anterior = galeria.actual;
     galeria.actual = (i + total) % total;
     const imagen = document.getElementById("detalle-imagen");
+    if (animar && anterior !== galeria.actual && detalle.open) {
+        imagen.classList.add("cambiando");
+        imagen.addEventListener("load", () => requestAnimationFrame(() => imagen.classList.remove("cambiando")), { once: true });
+        setTimeout(() => imagen.classList.remove("cambiando"), 400);
+    }
     imagen.src = galeria.fotos[galeria.actual];
     imagen.alt = galeria.nombre + ", foto " + (galeria.actual + 1) + " de " + total;
     document.getElementById("foto-contador").textContent = (galeria.actual + 1) + " / " + total;
@@ -123,8 +160,8 @@ document.getElementById("foto-siguiente").addEventListener("click", () => verFot
 
 // Flechas del teclado y deslizar con el dedo para cambiar de foto
 detalle.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowLeft") verFoto(galeria.actual - 1);
-    if (e.key === "ArrowRight") verFoto(galeria.actual + 1);
+    if (e.key === "ArrowLeft") verFoto(galeria.actual - 1, false);
+    if (e.key === "ArrowRight") verFoto(galeria.actual + 1, false);
 });
 
 let toqueInicio = null;
@@ -167,6 +204,9 @@ Promise.all([
     estado.productos = productos;
     pintarCategorias();
     filtrar("todos");
+    revelarAlBajar(document.querySelectorAll(
+        ".categorias-lista li, .catalogo-encabezado, .pasos h2, .pasos-lista li, .contacto > *, .pie > *"
+    ));
 
     document.querySelectorAll("[data-numero]").forEach((a) => {
         const c = contactos.find((x) => x.numero === a.dataset.numero);

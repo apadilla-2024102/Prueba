@@ -80,6 +80,19 @@ async function cargarCatalogo() {
     filtro.value = elegida;
     $("editor-categoria").innerHTML = opciones;
     pintarLista();
+    if (primeraCarga) {
+        primeraCarga = false;
+        animarEntrada();
+    }
+}
+
+// Solo la primera vez: las primeras filas aparecen escalonadas
+let primeraCarga = true;
+function animarEntrada() {
+    const lista = $("lista");
+    [...lista.children].slice(0, 12).forEach((fila, i) => fila.style.setProperty("--orden", i));
+    lista.classList.add("entrando");
+    setTimeout(() => lista.classList.remove("entrando"), 1200);
 }
 
 function nombreCategoria(id) {
