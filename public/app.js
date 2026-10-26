@@ -31,11 +31,16 @@ function pintarCategorias() {
     const filtros = [{ id: "todos", nombre: "Todos", total: estado.productos.length }]
         .concat(estado.categorias.map((c) => ({ id: c.id, nombre: c.nombre, total: contar(c.id) })));
 
-    document.getElementById("filtros").innerHTML = filtros.map((f) =>
-        '<button class="filtro" data-categoria="' + f.id + '" aria-pressed="false">' +
-            escapar(f.nombre) + '<span>' + f.total + '</span>' +
-        '</button>'
-    ).join("");
+    const contenido = (f) => escapar(f.nombre) + '<span>' + f.total + '</span>';
+    const fila = document.getElementById("filtros");
+    fila.innerHTML = filtros.map((f) =>
+        '<button class="filtro" data-categoria="' + f.id + '" aria-pressed="false">' + contenido(f) + '</button>'
+    ).join("") +
+        // Copia oscura de la fila; se recorta para mostrar solo el filtro activo
+        '<div class="filtros-activo" aria-hidden="true">' +
+            filtros.map((f) => '<span class="filtro">' + contenido(f) + '</span>').join("") +
+        '</div>';
+    fila.classList.add("con-indicador");
 
     document.querySelectorAll("[data-categoria]").forEach((boton) => {
         boton.addEventListener("click", () => {
@@ -55,8 +60,34 @@ function filtrar(id) {
     document.querySelectorAll("[data-categoria]").forEach((b) => {
         b.setAttribute("aria-pressed", String(b.dataset.categoria === id));
     });
+    moverIndicador();
     pintarProductos();
 }
+
+// Recorta la copia oscura justo sobre el filtro activo. La primera vez (y al cambiar
+// el tamaño de la ventana) se coloca sin animación.
+let indicadorListo = false;
+function moverIndicador() {
+    const copia = document.querySelector(".filtros-activo");
+    const activo = document.querySelector('.filtro[aria-pressed="true"]');
+    if (!copia || !activo) return;
+    const arriba = activo.offsetTop;
+    const izquierda = activo.offsetLeft;
+    const derecha = copia.offsetWidth - izquierda - activo.offsetWidth;
+    const abajo = copia.offsetHeight - arriba - activo.offsetHeight;
+    if (!indicadorListo) copia.style.transition = "none";
+    copia.style.clipPath = "inset(" + arriba + "px " + derecha + "px " + abajo + "px " + izquierda + "px round 999px)";
+    if (!indicadorListo) {
+        copia.offsetWidth; // aplica el recorte antes de devolver la transición
+        copia.style.transition = "";
+        indicadorListo = true;
+    }
+}
+
+window.addEventListener("resize", () => {
+    indicadorListo = false;
+    moverIndicador();
+});
 
 // ---------- Productos ----------
 // Las tarjetas aparecen al bajar solo la primera vez; al filtrar se muestran al instante
@@ -172,6 +203,53 @@ escenario.addEventListener("touchend", (e) => {
     const distancia = e.changedTouches[0].clientX - toqueInicio;
     if (Math.abs(distancia) > 40) verFoto(galeria.actual + (distancia < 0 ? 1 : -1));
     toqueInicio = null;
+});
+
+// ---------- Celular: bajar la hoja del detalle para cerrarla ----------
+// Un movimiento rápido basta aunque sea corto (velocidad > 0.11 px/ms, como en Vaul/Sonner).
+// Si no se suelta lo suficiente, vuelve a su lugar con la curva de cajón.
+const esCelular = window.matchMedia("(max-width: 900px)");
+const arrastre = { activo: false, decidido: false, x: 0, y: 0, hora: 0, distancia: 0 };
+
+detalle.addEventListener("touchstart", (e) => {
+    if (!esCelular.matches || detalle.scrollTop > 0 || e.touches.length > 1) return;
+    Object.assign(arrastre, { activo: true, decidido: false, x: e.touches[0].clientX, y: e.touches[0].clientY, hora: Date.now(), distancia: 0 });
+}, { passive: true });
+
+detalle.addEventListener("touchmove", (e) => {
+    if (!arrastre.activo) return;
+    const dx = e.touches[0].clientX - arrastre.x;
+    const dy = e.touches[0].clientY - arrastre.y;
+    if (!arrastre.decidido) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        // Solo cuenta si va hacia abajo y más vertical que horizontal (lo horizontal es la galería)
+        if (dy <= 0 || Math.abs(dx) > Math.abs(dy)) { arrastre.activo = false; return; }
+        arrastre.decidido = true;
+        detalle.style.transition = "none";
+    }
+    e.preventDefault();
+    arrastre.distancia = Math.max(0, dy);
+    detalle.style.transform = "translateY(" + arrastre.distancia + "px)";
+}, { passive: false });
+
+detalle.addEventListener("touchend", () => {
+    if (!arrastre.activo) return;
+    arrastre.activo = false;
+    if (!arrastre.decidido) return;
+    const velocidad = arrastre.distancia / Math.max(1, Date.now() - arrastre.hora);
+    if (arrastre.distancia > window.innerHeight * 0.25 || (velocidad > 0.11 && arrastre.distancia > 20)) {
+        detalle.style.transition = "transform 240ms cubic-bezier(0.23, 1, 0.32, 1)";
+        detalle.style.transform = "translateY(100%)";
+        setTimeout(() => {
+            detalle.style.transition = "none";
+            detalle.close();
+            requestAnimationFrame(() => { detalle.style.transform = ""; detalle.style.transition = ""; });
+        }, 240);
+    } else {
+        detalle.style.transition = "transform 300ms cubic-bezier(0.32, 0.72, 0, 1)";
+        detalle.style.transform = "";
+        setTimeout(() => { detalle.style.transition = ""; }, 300);
+    }
 });
 
 // ---------- Ventanas: cerrar con el botón, Escape o tocando afuera ----------

@@ -178,7 +178,8 @@ function pintarFotos() {
             return '<button type="button" class="foto foto-vacia" data-subir="' + i + '">' +
                 '<span aria-hidden="true">+</span>Subir foto ' + (i + 1) + "</button>";
         }
-        return '<div class="foto">' +
+        const nueva = estado.fotoNueva === i;
+        return '<div class="foto' + (nueva ? " foto-nueva" : "") + '">' +
             '<img src="' + escapar(src) + '" alt="Foto ' + (i + 1) + '">' +
             (i === 0 ? '<span class="foto-principal">Principal</span>' : "") +
             '<div class="foto-acciones">' +
@@ -187,7 +188,8 @@ function pintarFotos() {
                 '<button type="button" data-quitar="' + i + '">Quitar</button>' +
             "</div>" +
         "</div>";
-    }).join("");
+    }).join("");    // Solo la foto recién subida aparece con animación, y solo una vez
+    estado.fotoNueva = null;
 }
 
 $("fotos").addEventListener("click", (e) => {
@@ -249,6 +251,7 @@ $("elegir-foto").addEventListener("change", async (e) => {
         const datos = await achicarFoto(archivo);
         const { url } = await api("/imagenes", { method: "POST", datos: { datos } });
         estado.fotos[i] = url;
+        estado.fotoNueva = i;
     } catch (err) {
         if (anterior) estado.fotos[i] = anterior; else estado.fotos.splice(i, 1);
         $("error-producto").textContent = err.message;
@@ -298,14 +301,13 @@ form.addEventListener("submit", async (e) => {
     boton.disabled = true;
     boton.textContent = "Guardando…";
     try {
-        if (estado.editando) {
-            await api("/productos/" + estado.editando.id, { method: "PUT", datos });
-        } else {
-            await api("/productos", { method: "POST", datos });
-        }
+        const guardado = estado.editando
+            ? await api("/productos/" + estado.editando.id, { method: "PUT", datos })
+            : await api("/productos", { method: "POST", datos });
         editor.close();
         avisar(estado.editando ? "Cambios guardados" : "Producto agregado");
         await cargarCatalogo();
+        resaltar(guardado.id);
     } catch (err) {
         $("error-producto").textContent = err.message;
     } finally {
@@ -313,6 +315,35 @@ form.addEventListener("submit", async (e) => {
         boton.textContent = "Guardar";
     }
 });
+
+// ---------- Movimiento en la lista ----------
+function filaDe(id) {
+    return $("lista").querySelector('[data-editar="' + id + '"]')?.closest(".fila");
+}
+
+// El producto recién guardado se ilumina un momento: así se ve qué cambió
+function resaltar(id) {
+    const fila = filaDe(id);
+    if (!fila) return;
+    fila.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    fila.classList.add("recien");
+    setTimeout(() => fila.classList.remove("recien"), 1800);
+}
+
+// La fila eliminada se desvanece y luego se cierra su espacio (opacidad + alto)
+async function quitarFila(id) {
+    const fila = filaDe(id);
+    if (!fila || matchMedia("(prefers-reduced-motion: reduce)").matches || !fila.animate) return;
+    await fila.animate(
+        [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(.98)" }],
+        { duration: 160, easing: "ease-out", fill: "forwards" }
+    ).finished;
+    const alto = fila.offsetHeight;
+    await fila.animate(
+        [{ height: alto + "px", marginBottom: "0px" }, { height: "0px", paddingTop: "0px", paddingBottom: "0px", borderWidth: "0px", marginBottom: "-10px" }],
+        { duration: 220, easing: "cubic-bezier(0.23, 1, 0.32, 1)", fill: "forwards" }
+    ).finished;
+}
 
 // ---------- Eliminar ----------
 const confirmar = $("confirmar");
@@ -332,6 +363,7 @@ $("confirmar-eliminar").addEventListener("click", async () => {
         await api("/productos/" + porEliminar.id, { method: "DELETE" });
         confirmar.close();
         avisar("Producto eliminado");
+        await quitarFila(porEliminar.id);
         await cargarCatalogo();
     } catch (err) {
         $("error-eliminar").textContent = err.message;

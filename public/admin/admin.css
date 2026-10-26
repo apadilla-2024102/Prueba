@@ -330,3 +330,12 @@ legend { padding: 0; margin-bottom: 10px; font-size: .88rem; font-weight: 600; }
 
 /* La tarjeta de entrar aparece suave al abrir la página */
 .entrar-tarjeta { animation: fila-entra .5s var(--ease-out) backwards; }
+
+/* Foto recién subida: aparece con un leve crecimiento (nunca desde scale(0)) */
+.foto-nueva { animation: foto-entra .3s var(--ease-out) backwards; }
+
+@keyframes foto-entra { from { opacity: 0; transform: scale(.94); } }
+
+/* Producto recién guardado: se ilumina y vuelve a su color poco a poco */
+.fila { transition: background-color 1.4s ease, border-color 1.4s ease; }
+.fila.recien { background: var(--rubor); border-color: var(--frambuesa); transition-duration: 0s; }
