@@ -372,3 +372,16 @@ legend { padding: 0; margin-bottom: 10px; font-size: .88rem; font-weight: 600; }
 @media (prefers-reduced-motion: reduce) {
     .mantener-relleno { transition-property: clip-path !important; }
 }
+
+/* Especificación agregada con el botón: aparece suave */
+.spec-nueva { animation: fila-entra .25s var(--ease-out) backwards; }
+
+/* Contraseña incorrecta: sacudida corta y amortiguada */
+.entrar-tarjeta.sacudir { animation: sacudir .36s var(--ease-out); }
+
+@keyframes sacudir {
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(7px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(2px); }
+}
