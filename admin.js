@@ -6,6 +6,7 @@ const path = require("path");
 const crypto = require("crypto");
 const almacen = require("./data/almacen");
 const usuarios = require("./data/usuarios");
+const avisos = require("./data/avisos");
 
 const router = express.Router();
 
@@ -179,11 +180,15 @@ function responderError(res, e) {
 
 router.post("/api/productos", async (req, res) => {
     try {
+        let categorias = [];
         const producto = await almacen.modificar((catalogo) => {
+            categorias = catalogo.categorias;
             const nuevo = { id: Math.max(0, ...catalogo.productos.map((p) => p.id)) + 1, ...limpiarProducto(req.body, catalogo.categorias) };
             catalogo.productos.push(nuevo);
             return nuevo;
         });
+        // Se espera el correo antes de responder: en Vercel el servidor se pausa al responder
+        await avisos.avisarCambio({ usuario: req.admin.usuario, accion: "agregar", despues: producto, categorias });
         res.status(201).json(producto);
     } catch (e) { responderError(res, e); }
 });
@@ -191,12 +196,16 @@ router.post("/api/productos", async (req, res) => {
 router.put("/api/productos/:id", async (req, res) => {
     const id = Number(req.params.id);
     try {
+        let antes = null, categorias = [];
         const producto = await almacen.modificar((catalogo) => {
             const i = catalogo.productos.findIndex((p) => p.id === id);
             if (i < 0) throw new ErrorDeDatos("Ese producto ya no existe.");
+            antes = catalogo.productos[i];
+            categorias = catalogo.categorias;
             catalogo.productos[i] = { id, ...limpiarProducto(req.body, catalogo.categorias) };
             return catalogo.productos[i];
         });
+        await avisos.avisarCambio({ usuario: req.admin.usuario, accion: "editar", antes, despues: producto, categorias });
         res.json(producto);
     } catch (e) { responderError(res, e); }
 });
@@ -204,11 +213,14 @@ router.put("/api/productos/:id", async (req, res) => {
 router.delete("/api/productos/:id", async (req, res) => {
     const id = Number(req.params.id);
     try {
-        await almacen.modificar((catalogo) => {
+        let categorias = [];
+        const borrado = await almacen.modificar((catalogo) => {
             const i = catalogo.productos.findIndex((p) => p.id === id);
             if (i < 0) throw new ErrorDeDatos("Ese producto ya no existe.");
-            catalogo.productos.splice(i, 1);
+            categorias = catalogo.categorias;
+            return catalogo.productos.splice(i, 1)[0];
         });
+        await avisos.avisarCambio({ usuario: req.admin.usuario, accion: "eliminar", antes: borrado, categorias });
         res.json({ ok: true });
     } catch (e) { responderError(res, e); }
 });
