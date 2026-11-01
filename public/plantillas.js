@@ -58,7 +58,9 @@
 
     function categoriaHTML(c) {
         return '<li><button class="categoria" data-categoria="' + c.id + '" aria-pressed="false">' +
-            '<span class="categoria-foto"><img src="' + c.imagen + '" alt="" loading="lazy" width="300" height="400"></span>' +
+            '<span class="categoria-foto">' +
+                (c.imagen ? '<img src="' + c.imagen + '" alt="" loading="lazy" width="300" height="400">' : sinFotoHTML()) +
+            '</span>' +
             escapar(c.nombre) +
         '</button></li>';
     }

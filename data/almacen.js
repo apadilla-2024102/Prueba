@@ -58,8 +58,18 @@ async function listarVersiones() {
     return versiones.sort((a, b) => b.pathname.localeCompare(a.pathname));
 }
 
-// El catálogo más reciente, sin cachés: para el panel y antes de guardar un cambio
-async function leerActual() {
+// Las categorías se definen en data/productos.js: si ahí se agrega una nueva, aparece
+// también en el catálogo guardado (en el orden del código) sin tocar los productos.
+function completarCategorias(catalogo) {
+    if (!catalogo) return catalogo;
+    const guardadas = new Map((catalogo.categorias || []).map((c) => [c.id, c]));
+    const delCodigo = inicial.categorias.map((c) => guardadas.get(c.id) || { ...c });
+    const extra = (catalogo.categorias || []).filter((c) => !inicial.categorias.some((i) => i.id === c.id));
+    catalogo.categorias = delCodigo.concat(extra);
+    return catalogo;
+}
+
+async function leerSinCompletar() {
     if (USA_BLOB) {
         const [ultima] = await listarVersiones();
         if (ultima) return leerBlob(ultima.url);
@@ -68,6 +78,11 @@ async function leerActual() {
     }
     if (!fs.existsSync(ARCHIVO_LOCAL)) return copiaInicial();
     return JSON.parse(fs.readFileSync(ARCHIVO_LOCAL, "utf8"));
+}
+
+// El catálogo más reciente, sin cachés: para el panel y antes de guardar un cambio
+async function leerActual() {
+    return completarCategorias(await leerSinCompletar());
 }
 
 // Para la tienda: la versión más reciente, guardada en memoria unos segundos
@@ -80,7 +95,7 @@ async function leer() {
         // Si Blob falla, mejor mostrar lo último que se tenga que dejar la tienda vacía
         console.error("No se pudo leer la versión más reciente del catálogo", e.message);
         if (enMemoria) return enMemoria.catalogo;
-        catalogo = (USA_BLOB && (await leerBlob(ARCHIVO_BLOB).catch(() => null))) || copiaInicial();
+        catalogo = completarCategorias((USA_BLOB && (await leerBlob(ARCHIVO_BLOB).catch(() => null))) || copiaInicial());
     }
     enMemoria = { catalogo, hora: Date.now() };
     return catalogo;
