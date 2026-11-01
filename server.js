@@ -84,8 +84,17 @@ app.use(express.static(path.join(__dirname, "public"), {
 // Panel de administración oculto (/admin)
 app.use("/admin", admin);
 
+// Categorías con su foto: la propia o, si no tiene, la del primer producto de esa categoría con foto
+function categoriasParaMostrar({ categorias, productos }) {
+    return categorias.map((c) => {
+        if (c.imagen) return c;
+        const conFoto = productos.find((p) => p.categoria === c.id && p.imagenes && p.imagenes.length);
+        return { ...c, imagen: conFoto ? conFoto.imagenes[0] : null };
+    });
+}
+
 app.get("/api/categorias", async (req, res) => {
-    res.json((await almacen.leer()).categorias);
+    res.json(categoriasParaMostrar(await almacen.leer()));
 });
 
 // Catálogo con precio en quetzales, aproximado en dólares y enlace de WhatsApp ya armado.
@@ -235,7 +244,7 @@ function paginaHTML(base, { titulo, descripcion, ruta, contenido }) {
 
 app.get("/", async (req, res) => {
     const base = urlBase(req);
-    const { categorias } = await almacen.leer();
+    const categorias = categoriasParaMostrar(await almacen.leer());
     const lista = await productosParaMostrar();
     const html = PLANTILLA
         .replace("<!--SEO-->", etiquetasSEO(base, {
@@ -305,10 +314,11 @@ app.get("/sitemap.xml", async (req, res) => {
 
 // ---------- Página no encontrada (404 personalizada) ----------
 app.use(async (req, res) => {
-    const { categorias } = await almacen.leer();
-    const categoriasHTML = categorias.map((c) =>
-        '<li><a href="/#productos"><img src="' + c.imagen + '" alt="" loading="lazy" width="300" height="400">' +
-        plantillas.escapar(c.nombre) + '</a></li>'
+    const categoriasHTML = categoriasParaMostrar(await almacen.leer()).map((c) =>
+        '<li><a href="/#productos">' +
+            (c.imagen ? '<img src="' + c.imagen + '" alt="" loading="lazy" width="300" height="400">' : '<span class="categoria-sin-foto">' + plantillas.sinFotoHTML() + '</span>') +
+            plantillas.escapar(c.nombre) +
+        '</a></li>'
     ).join("");
     res.status(404).type("html").send(paginaHTML(urlBase(req), {
         titulo: "Página no encontrada | Drea Sparkle",

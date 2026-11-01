@@ -1,12 +1,15 @@
 // Avisos por correo de los cambios hechos en el panel /admin.
 //
 // Usa Resend (resend.com). En Vercel: Settings > Environment Variables
-//   RESEND_API_KEY: la clave de Resend (empieza con "re_"). Sin ella no se envía nada.
-//   AVISOS_CORREO:  a quién le llegan los avisos (opcional).
+//   RESEND_API_KEY:   la clave de Resend (empieza con "re_"). Sin ella no se envía nada.
+//   AVISOS_CORREO:    a quién le llegan los avisos (opcional).
+//   RESEND_API_KEY_2 y AVISOS_CORREO_2: una segunda cuenta de Resend y su correo (opcional).
 // Sin dominio propio, Resend solo deja enviar al correo con el que se creó la cuenta,
-// desde onboarding@resend.dev.
-const CLAVE = process.env.RESEND_API_KEY || "";
-const PARA = process.env.AVISOS_CORREO || "gahelpadilla10@gmail.com";
+// desde onboarding@resend.dev. Por eso cada correo usa la clave de su propia cuenta.
+const DESTINOS = [
+    { clave: process.env.RESEND_API_KEY || "", para: process.env.AVISOS_CORREO || "gahelpadilla10@gmail.com" },
+    { clave: process.env.RESEND_API_KEY_2 || "", para: process.env.AVISOS_CORREO_2 || "mariaandreaespinoza328@gmail.com" }
+].filter((d) => d.clave);
 const DE = process.env.AVISOS_REMITENTE || "Drea Sparkle <onboarding@resend.dev>";
 const SITE_URL = (process.env.SITE_URL || "https://dreasparkle.vercel.app").replace(/\/$/, "");
 
@@ -90,8 +93,22 @@ function correoHTML({ usuario, accion, producto, filas, titulo }) {
 
 // accion: "agregar" | "editar" | "eliminar". Nunca lanza error: si el correo falla,
 // el cambio del producto ya quedó guardado y solo se anota en los registros.
+async function enviar({ clave, para }, asunto, html) {
+    try {
+        const r = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: { Authorization: "Bearer " + clave, "Content-Type": "application/json" },
+            body: JSON.stringify({ from: DE, to: [para], subject: asunto, html }),
+            signal: AbortSignal.timeout(5000)
+        });
+        if (!r.ok) console.error("Resend no envió el aviso a " + para + ":", r.status, await r.text());
+    } catch (e) {
+        console.error("No se pudo enviar el aviso por correo a " + para + ":", e.message);
+    }
+}
+
 async function avisarCambio({ usuario, accion, antes, despues, categorias }) {
-    if (!CLAVE) return;
+    if (!DESTINOS.length) return;
     const producto = despues || antes;
     let filas;
     if (accion === "editar") {
@@ -101,17 +118,9 @@ async function avisarCambio({ usuario, accion, antes, despues, categorias }) {
         filas = campos(producto, categorias);
     }
     const asunto = usuario + " " + ACCIONES[accion].verbo + " “" + producto.nombre + "”";
-    try {
-        const r = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: { Authorization: "Bearer " + CLAVE, "Content-Type": "application/json" },
-            body: JSON.stringify({ from: DE, to: [PARA], subject: asunto, html: correoHTML({ usuario, accion, producto, filas, titulo: asunto }) }),
-            signal: AbortSignal.timeout(5000)
-        });
-        if (!r.ok) console.error("Resend no envió el aviso:", r.status, await r.text());
-    } catch (e) {
-        console.error("No se pudo enviar el aviso por correo:", e.message);
-    }
+    const html = correoHTML({ usuario, accion, producto, filas, titulo: asunto });
+    // Se envían a la vez; si uno falla, el otro llega igual
+    await Promise.all(DESTINOS.map((d) => enviar(d, asunto, html)));
 }
 
-module.exports = { avisarCambio, ACTIVO: Boolean(CLAVE) };
+module.exports = { avisarCambio, ACTIVO: DESTINOS.length > 0 };

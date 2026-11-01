@@ -14,6 +14,8 @@ const categorias = [
     { id: "fragancias", nombre: "Cremas y fragancias", imagen: "/img/vs-love-spell.jpg" },
     { id: "facial", nombre: "Cuidado facial", imagen: "/img/ordinary-hialuronico.jpg" },
     { id: "pulseras", nombre: "Pulseras", imagen: "/img/pulsera-dijes-dorada.jpg" },
+    // Sin foto propia: la tienda usa la del primer producto de cadenas que tenga foto
+    { id: "cadenas", nombre: "Cadenas", imagen: null },
     { id: "anillos", nombre: "Anillos", imagen: "/img/anillos-set-3.jpg" },
     { id: "aretes", nombre: "Aretes", imagen: "/img/aretes-xuping.jpg" },
     { id: "maquillaje", nombre: "Maquillaje", imagen: "/img/rhode-lip-treatment.jpg" }
