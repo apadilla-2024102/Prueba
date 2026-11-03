@@ -69,6 +69,31 @@ function completarCategorias(catalogo) {
     return catalogo;
 }
 
+// Productos cargados en lote (data/importaciones/*.json). Cada archivo se suma una sola
+// vez: el catálogo guarda en "importaciones" cuáles ya entraron, así un producto que
+// después se borre desde el panel no vuelve. Hasta el siguiente guardado se suman en
+// memoria, siempre con los mismos ids, y el primer guardado los deja fijos.
+const CARPETA_IMPORTACIONES = path.join(__dirname, "importaciones");
+const IMPORTACIONES = fs.existsSync(CARPETA_IMPORTACIONES)
+    ? fs.readdirSync(CARPETA_IMPORTACIONES).filter((f) => f.endsWith(".json")).sort()
+        .map((f) => ({ id: f.replace(/\.json$/, ""), productos: JSON.parse(fs.readFileSync(path.join(CARPETA_IMPORTACIONES, f), "utf8")) }))
+    : [];
+
+function aplicarImportaciones(catalogo) {
+    if (!catalogo) return catalogo;
+    const hechas = new Set(catalogo.importaciones || []);
+    for (const imp of IMPORTACIONES) {
+        if (hechas.has(imp.id)) continue;
+        let id = Math.max(0, ...catalogo.productos.map((p) => p.id));
+        for (const p of imp.productos) {
+            catalogo.productos.push({ id: ++id, desc: "", imagenes: [], specs: [], ...p });
+        }
+        hechas.add(imp.id);
+    }
+    catalogo.importaciones = [...hechas];
+    return catalogo;
+}
+
 async function leerSinCompletar() {
     if (USA_BLOB) {
         const [ultima] = await listarVersiones();
@@ -82,7 +107,7 @@ async function leerSinCompletar() {
 
 // El catálogo más reciente, sin cachés: para el panel y antes de guardar un cambio
 async function leerActual() {
-    return completarCategorias(await leerSinCompletar());
+    return aplicarImportaciones(completarCategorias(await leerSinCompletar()));
 }
 
 // Para la tienda: la versión más reciente, guardada en memoria unos segundos
@@ -95,7 +120,7 @@ async function leer() {
         // Si Blob falla, mejor mostrar lo último que se tenga que dejar la tienda vacía
         console.error("No se pudo leer la versión más reciente del catálogo", e.message);
         if (enMemoria) return enMemoria.catalogo;
-        catalogo = completarCategorias((USA_BLOB && (await leerBlob(ARCHIVO_BLOB).catch(() => null))) || copiaInicial());
+        catalogo = aplicarImportaciones(completarCategorias((USA_BLOB && (await leerBlob(ARCHIVO_BLOB).catch(() => null))) || copiaInicial()));
     }
     enMemoria = { catalogo, hora: Date.now() };
     return catalogo;

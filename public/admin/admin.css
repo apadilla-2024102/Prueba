@@ -385,3 +385,15 @@ legend { padding: 0; margin-bottom: 10px; font-size: .88rem; font-weight: 600; }
     60% { transform: translateX(-4px); }
     80% { transform: translateX(2px); }
 }
+
+/* Código interno del producto: solo en el panel */
+.codigo {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 6px;
+    background: var(--tinta);
+    color: #fff;
+    font: 600 .75rem var(--sans);
+    letter-spacing: .03em;
+    vertical-align: middle;
+}

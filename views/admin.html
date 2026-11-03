@@ -61,7 +61,7 @@
             <div class="panel-filtros">
                 <label class="campo campo-buscar">
                     <span class="visualmente-oculto">Buscar</span>
-                    <input type="search" id="buscar" placeholder="Buscar por nombre o marca">
+                    <input type="search" id="buscar" placeholder="Buscar por nombre, marca o código">
                 </label>
                 <label class="campo">
                     <span class="visualmente-oculto">Categoría</span>
@@ -91,6 +91,11 @@
                 <label class="campo">
                     <span>Nombre o título</span>
                     <input name="nombre" maxlength="120" required>
+                </label>
+
+                <label class="campo">
+                    <span>Código interno <small>(solo se ve en este panel, no en la tienda)</small></span>
+                    <input name="codigo" maxlength="30" autocomplete="off" spellcheck="false" placeholder="Ej. 297-1">
                 </label>
 
                 <div class="campos-dos">

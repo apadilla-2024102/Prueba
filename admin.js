@@ -157,10 +157,12 @@ function limpiarProducto(datos, categorias) {
         .slice(0, 20);
 
     const marca = texto(datos.marca, 60);
+    const codigo = texto(datos.codigo, 30);   // código interno: solo se ve en el panel
     return {
         categoria,
         nombre,
         ...(marca ? { marca } : {}),
+        ...(codigo ? { codigo } : {}),
         desc: texto(datos.desc, 600),
         precio,
         ...(cantidad !== undefined ? { cantidad } : {}),

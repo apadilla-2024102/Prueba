@@ -138,7 +138,7 @@ function pintarLista() {
     const categoria = $("filtro-categoria").value;
     const lista = estado.productos.filter((p) =>
         (!categoria || p.categoria === categoria) &&
-        (!busqueda || (p.nombre + " " + (p.marca || "")).toLowerCase().includes(busqueda))
+        (!busqueda || (p.nombre + " " + (p.marca || "") + " " + (p.codigo || "")).toLowerCase().includes(busqueda))
     );
 
     $("resumen").textContent = estado.productos.length + " productos en total" +
@@ -148,7 +148,10 @@ function pintarLista() {
         '<li class="fila">' +
             '<span class="fila-foto">' + (p.imagenes[0] ? '<img src="' + escapar(p.imagenes[0]) + '" alt="" loading="lazy">' : "Sin foto") + "</span>" +
             '<div class="fila-info">' +
-                '<p class="fila-nombre">' + escapar(p.nombre) + (p.destacado ? ' <span class="etiqueta">Favorito</span>' : "") + "</p>" +
+                '<p class="fila-nombre">' +
+                    (p.codigo ? '<span class="codigo" title="Código interno (no se ve en la tienda)">' + escapar(p.codigo) + "</span> " : "") +
+                    escapar(p.nombre) + (p.destacado ? ' <span class="etiqueta">Favorito</span>' : "") +
+                "</p>" +
                 '<p class="fila-datos">' + escapar([p.marca, nombreCategoria(p.categoria)].filter(Boolean).join(" · ")) + "</p>" +
                 '<p class="fila-datos">' +
                     (typeof p.precio === "number" ? "Q" + p.precio : "Consultar precio") +
@@ -230,6 +233,7 @@ function abrirEditor(producto) {
     form.reset();
     form.nombre.value = producto?.nombre || "";
     form.marca.value = producto?.marca || "";
+    form.codigo.value = producto?.codigo || "";
     form.categoria.value = producto?.categoria || $("filtro-categoria").value || estado.categorias[0]?.id || "";
     form.desc.value = producto?.desc || "";
     form.precio.value = typeof producto?.precio === "number" ? producto.precio : "";
@@ -397,6 +401,7 @@ form.addEventListener("submit", async (e) => {
     const datos = {
         nombre: form.nombre.value,
         marca: form.marca.value,
+        codigo: form.codigo.value,
         categoria: form.categoria.value,
         desc: form.desc.value,
         precio: form.precio.value === "" ? null : form.precio.value,
