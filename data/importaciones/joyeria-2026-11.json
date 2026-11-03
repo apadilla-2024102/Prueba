@@ -1,0 +1,1036 @@
+[
+ {
+  "categoria": "pulseras",
+  "nombre": "Pulsera pandora de flor",
+  "precio": 70.0,
+  "cantidad": 1,
+  "codigo": "026",
+  "specs": []
+ },
+ {
+  "categoria": "pulseras",
+  "nombre": "Pulsera pandora de flor",
+  "precio": 70.0,
+  "cantidad": 1,
+  "codigo": "027",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes trébol plata",
+  "precio": 75.0,
+  "cantidad": 1,
+  "codigo": "028",
+  "specs": [
+   [
+    "Tono",
+    "Plateado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Arete trébol dorado",
+  "precio": 75.0,
+  "cantidad": 1,
+  "codigo": "029",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Cadena cubana delgada dorada 45 cm",
+  "precio": 150.0,
+  "cantidad": 1,
+  "codigo": "328",
+  "specs": [
+   [
+    "Largo",
+    "45 cm"
+   ],
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "anillos",
+  "nombre": "Anillo de pez talla 8",
+  "precio": 100.0,
+  "cantidad": 1,
+  "codigo": "297",
+  "specs": [
+   [
+    "Talla",
+    "8"
+   ]
+  ]
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Cadena rolo dorada 44.5 cm",
+  "precio": 150.0,
+  "cantidad": 1,
+  "codigo": "",
+  "specs": [
+   [
+    "Largo",
+    "44.5 cm"
+   ],
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "anillos",
+  "nombre": "Anillo flor zirconia central talla 7",
+  "precio": 75.0,
+  "cantidad": 1,
+  "codigo": "297-1",
+  "specs": [
+   [
+    "Talla",
+    "7"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes flor con zirconia central",
+  "precio": 150.0,
+  "cantidad": 1,
+  "codigo": "113",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes con flor zirconia morada",
+  "precio": 120.0,
+  "cantidad": 1,
+  "codigo": "226",
+  "specs": []
+ },
+ {
+  "categoria": "pulseras",
+  "nombre": "Pulsera zirconia dorada 21 cm",
+  "precio": 100.0,
+  "cantidad": 1,
+  "codigo": "406",
+  "specs": [
+   [
+    "Largo",
+    "21 cm"
+   ],
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Collar delgado con dije de zirconia",
+  "precio": 90.0,
+  "cantidad": 1,
+  "codigo": "030",
+  "specs": []
+ },
+ {
+  "categoria": "anillos",
+  "nombre": "Anillo dorado minimalista",
+  "precio": 65.0,
+  "cantidad": 1,
+  "codigo": "198",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "anillos",
+  "nombre": "Anillo con eslabón de corazón talla 9",
+  "precio": 65.0,
+  "cantidad": 1,
+  "codigo": "240",
+  "specs": [
+   [
+    "Talla",
+    "9"
+   ]
+  ]
+ },
+ {
+  "categoria": "pulseras",
+  "nombre": "Pulsera con bolitas 21 cm",
+  "precio": 100.0,
+  "cantidad": 1,
+  "codigo": "231",
+  "specs": [
+   [
+    "Largo",
+    "21 cm"
+   ]
+  ]
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Collar dorado con eslabón tejido y bolitas 45 cm",
+  "precio": 160.0,
+  "cantidad": 1,
+  "codigo": "712",
+  "specs": [
+   [
+    "Largo",
+    "45 cm"
+   ],
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "anillos",
+  "nombre": "Anillo dorado serpiente talla 9.5",
+  "precio": 65.0,
+  "cantidad": 1,
+  "codigo": "215",
+  "specs": [
+   [
+    "Talla",
+    "9.5"
+   ],
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "pulseras",
+  "nombre": "Pulsera dorada minimalista 22 cm",
+  "precio": 100.0,
+  "cantidad": 1,
+  "codigo": "321",
+  "specs": [
+   [
+    "Largo",
+    "22 cm"
+   ],
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes dorados con lazo y zirconias",
+  "precio": 160.0,
+  "cantidad": 1,
+  "codigo": "432",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes mariposa con zirconia",
+  "precio": 150.0,
+  "cantidad": 1,
+  "codigo": "216",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes aurota",
+  "precio": 120.0,
+  "cantidad": 1,
+  "codigo": "228",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes perla mediana",
+  "precio": 100.0,
+  "cantidad": 1,
+  "codigo": "79",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes de mariposa",
+  "precio": 75.0,
+  "cantidad": 1,
+  "codigo": "76",
+  "specs": []
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Cadena dorada 46 cm",
+  "precio": 140.0,
+  "cantidad": 1,
+  "codigo": "318",
+  "specs": [
+   [
+    "Largo",
+    "46 cm"
+   ],
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes pequeños de cruz",
+  "precio": 50.0,
+  "cantidad": 1,
+  "codigo": "29",
+  "specs": []
+ },
+ {
+  "categoria": "anillos",
+  "nombre": "Anillo flor de luz talla 9.5",
+  "precio": 65.0,
+  "cantidad": 1,
+  "codigo": "273",
+  "specs": [
+   [
+    "Talla",
+    "9.5"
+   ]
+  ]
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Cadena delgada con bolitas 45.5 cm",
+  "precio": 100.0,
+  "cantidad": 1,
+  "codigo": "483",
+  "specs": [
+   [
+    "Largo",
+    "45.5 cm"
+   ]
+  ]
+ },
+ {
+  "categoria": "anillos",
+  "nombre": "Anillo de compromiso con zirconias a los lados talla 8.5",
+  "precio": 65.0,
+  "cantidad": 1,
+  "codigo": "031",
+  "specs": [
+   [
+    "Talla",
+    "8.5"
+   ]
+  ]
+ },
+ {
+  "categoria": "pulseras",
+  "nombre": "Pulsera con eslabón pequeño y piedra 21 cm",
+  "precio": 110.0,
+  "cantidad": 1,
+  "codigo": "310",
+  "specs": [
+   [
+    "Largo",
+    "21 cm"
+   ]
+  ]
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Collar eslabones dorados",
+  "precio": 90.0,
+  "cantidad": 1,
+  "codigo": "358",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes de piedra tornasol",
+  "precio": 100.0,
+  "cantidad": 1,
+  "codigo": "42",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes vuelo dorado",
+  "precio": 150.0,
+  "cantidad": 1,
+  "codigo": "142",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes pequeños de amor",
+  "precio": 80.0,
+  "cantidad": 1,
+  "codigo": "56",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes con zirconia naranja",
+  "precio": 110.0,
+  "cantidad": 1,
+  "codigo": "170",
+  "specs": []
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Dije rombo con zirconias",
+  "precio": 75.0,
+  "cantidad": 1,
+  "codigo": "121",
+  "specs": []
+ },
+ {
+  "categoria": "pulseras",
+  "nombre": "Pulsera eslabones dorados 21 cm",
+  "precio": 100.0,
+  "cantidad": 1,
+  "codigo": "279",
+  "specs": [
+   [
+    "Largo",
+    "21 cm"
+   ],
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "anillos",
+  "nombre": "Anillo latido de luz talla 7",
+  "precio": 65.0,
+  "cantidad": 1,
+  "codigo": "256",
+  "specs": [
+   [
+    "Talla",
+    "7"
+   ]
+  ]
+ },
+ {
+  "categoria": "anillos",
+  "nombre": "Anillo de eternidad talla 8",
+  "precio": 65.0,
+  "cantidad": 1,
+  "codigo": "327",
+  "specs": [
+   [
+    "Talla",
+    "8"
+   ]
+  ]
+ },
+ {
+  "categoria": "anillos",
+  "nombre": "Anillo flor de estrellas talla 7",
+  "precio": 65.0,
+  "cantidad": 1,
+  "codigo": "198",
+  "specs": [
+   [
+    "Talla",
+    "7"
+   ]
+  ]
+ },
+ {
+  "categoria": "anillos",
+  "nombre": "Anillo corazón eslabón talla 7",
+  "precio": 65.0,
+  "cantidad": 1,
+  "codigo": "215",
+  "specs": [
+   [
+    "Talla",
+    "7"
+   ]
+  ]
+ },
+ {
+  "categoria": "anillos",
+  "nombre": "Anillo con corazón y dos zirconias talla 8",
+  "precio": 65.0,
+  "cantidad": 1,
+  "codigo": "198-1",
+  "specs": [
+   [
+    "Talla",
+    "8"
+   ]
+  ]
+ },
+ {
+  "categoria": "anillos",
+  "nombre": "Anillo infinito con 4 zirconias talla 8.5",
+  "precio": 65.0,
+  "cantidad": 1,
+  "codigo": "215-2",
+  "specs": [
+   [
+    "Talla",
+    "8.5"
+   ]
+  ]
+ },
+ {
+  "categoria": "anillos",
+  "nombre": "Anillo estrella floral talla 8",
+  "precio": 65.0,
+  "cantidad": 1,
+  "codigo": "259",
+  "specs": [
+   [
+    "Talla",
+    "8"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes rubí rojo",
+  "precio": 120.0,
+  "cantidad": 1,
+  "codigo": "223",
+  "specs": []
+ },
+ {
+  "categoria": "pulseras",
+  "nombre": "Pulsera lluvia de oro 19 cm",
+  "precio": 130.0,
+  "cantidad": 1,
+  "codigo": "426",
+  "specs": [
+   [
+    "Largo",
+    "19 cm"
+   ],
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes rectángulo dorado",
+  "precio": 150.0,
+  "cantidad": 1,
+  "codigo": "284",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Collar serpiente dorado",
+  "precio": 120.0,
+  "cantidad": 1,
+  "codigo": "280",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes brillo sencillo",
+  "precio": 110.0,
+  "cantidad": 1,
+  "codigo": "42-01",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Arete piedra verde",
+  "precio": 110.0,
+  "cantidad": 1,
+  "codigo": "35",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes de perla redonda",
+  "precio": 60.0,
+  "cantidad": 1,
+  "codigo": "52",
+  "specs": []
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Dije brillo de fortuna",
+  "precio": 80.0,
+  "cantidad": 1,
+  "codigo": "152",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes de perla corazón",
+  "precio": 60.0,
+  "cantidad": 1,
+  "codigo": "46",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes corazón dorado con piedras",
+  "precio": 100.0,
+  "cantidad": 1,
+  "codigo": "197",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes corazón liso",
+  "precio": 50.0,
+  "cantidad": 1,
+  "codigo": "53",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes flor dorado",
+  "precio": 70.0,
+  "cantidad": 1,
+  "codigo": "315",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Collar bolitas doradas",
+  "precio": 110.0,
+  "cantidad": 1,
+  "codigo": "383",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes con corazón orilla dorada",
+  "precio": 120.0,
+  "cantidad": 1,
+  "codigo": "112",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes flor con piedras doradas",
+  "precio": 130.0,
+  "cantidad": 1,
+  "codigo": "154",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes con corazón entrelazados",
+  "precio": 135.0,
+  "cantidad": 1,
+  "codigo": "245",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes nudo dorados con zirconias",
+  "precio": 140.0,
+  "cantidad": 1,
+  "codigo": "218",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Collar minimalista dorado",
+  "precio": 120.0,
+  "cantidad": 1,
+  "codigo": "302",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes flor con piedras negras",
+  "precio": 120.0,
+  "cantidad": 1,
+  "codigo": "228-01",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes doble corazón con zirconias",
+  "precio": 110.0,
+  "cantidad": 1,
+  "codigo": "131",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes de cuadrado dorado",
+  "precio": 60.0,
+  "cantidad": 1,
+  "codigo": "49",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Árbol de la vida",
+  "precio": 75.0,
+  "cantidad": 1,
+  "codigo": "79-01",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes aros ovalados dorados",
+  "precio": 140.0,
+  "cantidad": 1,
+  "codigo": "210",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes de fresa",
+  "precio": 65.0,
+  "cantidad": 1,
+  "codigo": "56-01",
+  "specs": []
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Dije flor dorado con piedras",
+  "precio": 75.0,
+  "cantidad": 1,
+  "codigo": "138",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes geométricos",
+  "precio": 150.0,
+  "cantidad": 1,
+  "codigo": "217",
+  "specs": []
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Dije geométrico dorado",
+  "precio": 80.0,
+  "cantidad": 1,
+  "codigo": "189",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes de estrella dorado",
+  "precio": 60.0,
+  "cantidad": 1,
+  "codigo": "55",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes corazón hueco texturizado",
+  "precio": 60.0,
+  "cantidad": 1,
+  "codigo": "31",
+  "specs": []
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Dije corazón doble con piedras",
+  "precio": 80.0,
+  "cantidad": 1,
+  "codigo": "145",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes aro u dorado",
+  "precio": 100.0,
+  "cantidad": 1,
+  "codigo": "219",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes moño con zirconias",
+  "precio": 110.0,
+  "cantidad": 1,
+  "codigo": "136",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes flor con piedras naranja",
+  "precio": 100.0,
+  "cantidad": 1,
+  "codigo": "229",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes rombo",
+  "precio": 50.0,
+  "cantidad": 1,
+  "codigo": "40",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes flor con piedras alrededor",
+  "precio": 110.0,
+  "cantidad": 1,
+  "codigo": "198-2",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes corazón perla con borde dorado",
+  "precio": 100.0,
+  "cantidad": 1,
+  "codigo": "106",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "pulseras",
+  "nombre": "Pulsera con piedras de colores 21 cm",
+  "precio": 110.0,
+  "cantidad": 1,
+  "codigo": "643",
+  "specs": [
+   [
+    "Largo",
+    "21 cm"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes circulares con corazones dorados y piedras",
+  "precio": 120.0,
+  "cantidad": 1,
+  "codigo": "295",
+  "specs": [
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Argollas de corazón con zirconias",
+  "precio": 130.0,
+  "cantidad": 1,
+  "codigo": "313",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes de huesito con zirconia",
+  "precio": 80.0,
+  "cantidad": 1,
+  "codigo": "44",
+  "specs": []
+ },
+ {
+  "categoria": "pulseras",
+  "nombre": "Pulsera dorada con piedras rectangulares 15 cm",
+  "precio": 90.0,
+  "cantidad": 1,
+  "codigo": "315",
+  "specs": [
+   [
+    "Largo",
+    "15 cm"
+   ],
+   [
+    "Tono",
+    "Dorado"
+   ]
+  ]
+ },
+ {
+  "categoria": "pulseras",
+  "nombre": "Pulsera trenzada delgada 18.5 cm",
+  "precio": 140.0,
+  "cantidad": 1,
+  "codigo": "404",
+  "specs": [
+   [
+    "Largo",
+    "18.5 cm"
+   ]
+  ]
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes piedra roja",
+  "precio": 60.0,
+  "cantidad": 1,
+  "codigo": "32",
+  "specs": []
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Dije brillo eterno",
+  "precio": 80.0,
+  "cantidad": 1,
+  "codigo": "130",
+  "specs": []
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Dije trébol de 4 hojas con piedra negra",
+  "precio": 80.0,
+  "cantidad": 1,
+  "codigo": "122",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes zafiro nocturno",
+  "precio": 100.0,
+  "cantidad": 1,
+  "codigo": "188",
+  "specs": []
+ },
+ {
+  "categoria": "cadenas",
+  "nombre": "Dije de trébol 4 hojas con zirconias",
+  "precio": 80.0,
+  "cantidad": 1,
+  "codigo": "165",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Primadera rodada",
+  "precio": 110.0,
+  "cantidad": 1,
+  "codigo": "172",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes corazón de ámbar",
+  "precio": 100.0,
+  "cantidad": 1,
+  "codigo": "195",
+  "specs": []
+ },
+ {
+  "categoria": "aretes",
+  "nombre": "Aretes corazón estelar",
+  "precio": 110.0,
+  "cantidad": 1,
+  "codigo": "63",
+  "specs": []
+ }
+]

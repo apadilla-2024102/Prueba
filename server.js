@@ -101,7 +101,8 @@ app.get("/api/categorias", async (req, res) => {
 // Se alternan los dos números para repartir los mensajes.
 async function productosParaMostrar() {
     const { productos } = await almacen.leer();
-    return productos.map((p, i) => {
+    // El código interno es solo para el panel: no sale en la tienda ni en sus datos
+    return productos.map(({ codigo, ...p }, i) => {
         const numero = NUMEROS[i % NUMEROS.length];
         const nombre = p.marca ? p.nombre + " (" + p.marca + ")" : p.nombre;
         const tienePrecio = typeof p.precio === "number";
