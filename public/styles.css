@@ -735,7 +735,9 @@ a { color: inherit; }
 .texto-legal p, .texto-legal li { color: var(--texto-suave); }
 .texto-legal p + p { margin-top: 12px; }
 .texto-legal strong { color: var(--tinta); font-weight: 600; }
-.texto-legal ul { padding-left: 1.2em; margin: 10px 0 0; display: grid; gap: 8px; }
+.texto-legal ul, .texto-legal ol { padding-left: 1.2em; margin: 10px 0 0; display: grid; gap: 8px; }
+.texto-legal a:not(.boton) { color: var(--frambuesa); text-underline-offset: 3px; }
+.texto-legal ul + p, .texto-legal ol + p { margin-top: 14px; }
 .texto-legal-fecha { font-size: .85rem; margin-bottom: 8px; }
 .texto-legal-volver { margin-top: 40px; }
 

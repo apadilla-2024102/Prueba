@@ -217,9 +217,10 @@ function etiquetasSEO(base, { titulo, descripcion, ruta, datos }) {
     ].filter(Boolean).join("\n    ");
 }
 
-// Enlaces del pie: política de privacidad y ficha de Google (si está configurada).
+// Enlaces del pie: términos, política de privacidad y ficha de Google (si está configurada).
 function enlacesPie() {
     return '<nav class="pie-enlaces" aria-label="Información">' +
+        '<a href="/terminos">Términos y condiciones</a>' +
         '<a href="/privacidad">Política de privacidad</a>' +
         (GOOGLE_BUSINESS_URL
             ? '<a href="' + plantillas.escapar(GOOGLE_BUSINESS_URL) + '" target="_blank" rel="noopener">Encuéntranos en Google</a>'
@@ -230,6 +231,7 @@ function enlacesPie() {
 // Páginas secundarias (privacidad, 404) con la misma barra y pie que la tienda.
 const PAGINA = fs.readFileSync(path.join(__dirname, "views", "pagina.html"), "utf8");
 const PRIVACIDAD = fs.readFileSync(path.join(__dirname, "views", "privacidad.html"), "utf8");
+const TERMINOS = fs.readFileSync(path.join(__dirname, "views", "terminos.html"), "utf8");
 const NO_ENCONTRADA = fs.readFileSync(path.join(__dirname, "views", "404.html"), "utf8");
 
 function paginaHTML(base, { titulo, descripcion, ruta, contenido }) {
@@ -264,20 +266,36 @@ app.get("/", async (req, res) => {
     res.type("html").send(html);
 });
 
-// ---------- Política de privacidad ----------
-// Fecha de la última vez que se cambió el texto de views/privacidad.html.
+// ---------- Política de privacidad y términos y condiciones ----------
+// Fecha de la última vez que se cambió el texto de cada página (views/privacidad.html y views/terminos.html).
 const PRIVACIDAD_ACTUALIZADA = "2026-10-23";
+const TERMINOS_ACTUALIZADOS = "2026-11-05";
+
+function fechaLarga(iso) {
+    const [anio, mes, dia] = iso.split("-").map(Number);
+    return new Date(Date.UTC(anio, mes - 1, dia))
+        .toLocaleDateString("es-GT", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+}
+
+function numerosTexto() {
+    return NUMEROS.map((n) => n.slice(0, 4) + "-" + n.slice(4)).join(" o al ");
+}
 
 app.get("/privacidad", (req, res) => {
-    const [anio, mes, dia] = PRIVACIDAD_ACTUALIZADA.split("-").map(Number);
-    const fecha = new Date(Date.UTC(anio, mes - 1, dia))
-        .toLocaleDateString("es-GT", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
-    const numeros = NUMEROS.map((n) => n.slice(0, 4) + "-" + n.slice(4)).join(" o al ");
     res.type("html").send(paginaHTML(urlBase(req), {
         titulo: "Política de privacidad | Drea Sparkle",
         descripcion: "Qué datos usa Drea Sparkle cuando visitas la tienda o haces un pedido por WhatsApp, y cómo pedir que los corrijamos o borremos.",
         ruta: "/privacidad",
-        contenido: PRIVACIDAD.replace("<!--FECHA-->", fecha).replace("<!--NUMEROS-->", numeros)
+        contenido: PRIVACIDAD.replace("<!--FECHA-->", fechaLarga(PRIVACIDAD_ACTUALIZADA)).replace("<!--NUMEROS-->", numerosTexto())
+    }));
+});
+
+app.get("/terminos", (req, res) => {
+    res.type("html").send(paginaHTML(urlBase(req), {
+        titulo: "Términos y condiciones | Drea Sparkle",
+        descripcion: "Cómo comprar en Drea Sparkle: precios en quetzales, pedidos por WhatsApp, pago, entrega, cambios y devoluciones.",
+        ruta: "/terminos",
+        contenido: TERMINOS.replace("<!--FECHA-->", fechaLarga(TERMINOS_ACTUALIZADOS)).replace("<!--NUMEROS-->", numerosTexto())
     }));
 });
 
@@ -308,6 +326,10 @@ app.get("/sitemap.xml", async (req, res) => {
         "  <url>\n" +
         "    <loc>" + xml(base + "/privacidad") + "</loc>\n" +
         "    <lastmod>" + PRIVACIDAD_ACTUALIZADA + "</lastmod>\n" +
+        "  </url>\n" +
+        "  <url>\n" +
+        "    <loc>" + xml(base + "/terminos") + "</loc>\n" +
+        "    <lastmod>" + TERMINOS_ACTUALIZADOS + "</lastmod>\n" +
         "  </url>\n" +
         "</urlset>\n"
     );
