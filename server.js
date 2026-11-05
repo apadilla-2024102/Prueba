@@ -28,7 +28,7 @@ app.disable("x-powered-by");
 
 // Números de WhatsApp. Código de país 502 (Guatemala): cámbialo si es otro país.
 const CODIGO_PAIS = "502";
-const NUMEROS = ["41408342", "51981445"];
+const NUMEROS = ["41408342", "59895169"];
 const MENSAJE_GENERAL = "¡Hola! Vi la página de Drea Sparkle y me interesa comprar. ¿Me pueden dar más información?";
 
 // Los precios del catálogo están en quetzales. El precio en dólares se calcula
