@@ -45,6 +45,19 @@ function enlaceWhatsApp(numero, mensaje) {
     return "https://wa.me/" + CODIGO_PAIS + numero + "?text=" + encodeURIComponent(mensaje);
 }
 
+// ---------- Una sola dirección para la tienda ----------
+// Vercel también publica la tienda en otras direcciones (prueba-padilla1.vercel.app,
+// prueba-peach-two.vercel.app…). Para Google son copias de la misma página, así que en
+// producción todas redirigen de forma permanente a la oficial (SITE_URL), con la misma ruta.
+// Las vistas previas de Vercel (VERCEL_ENV "preview") y tu computadora no se redirigen.
+const HOST_OFICIAL = new URL(SITE_URL).host;
+app.use((req, res, next) => {
+    const host = req.get("host") || "";
+    if (process.env.VERCEL_ENV !== "production" || !host || host === HOST_OFICIAL) return next();
+    // 301 para visitas normales; 308 conserva el método si llega un envío de datos
+    res.redirect(req.method === "GET" || req.method === "HEAD" ? 301 : 308, SITE_URL + req.originalUrl);
+});
+
 // ---------- Forzar HTTPS ----------
 // Redirige http:// a https:// (menos en tu computadora) y le pide al navegador
 // que siempre use https (HSTS). Vercel ya redirige, esto cubre cualquier otro hosting.
