@@ -20,6 +20,8 @@ const GOOGLE_SITE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION || "";
 //   En business.google.com > tu negocio > "Compartir perfil", copia el enlace.
 //   Se usa en el pie de página y en los datos estructurados (sameAs).
 const GOOGLE_BUSINESS_URL = process.env.GOOGLE_BUSINESS_URL || "";
+// Instagram oficial de la tienda: Google lo usa para saber que la página y la cuenta son el mismo negocio
+const INSTAGRAM_URL = "https://www.instagram.com/dreasparkle_/";
 const NOMBRE_TIENDA = "Drea Sparkle";
 
 // Vercel atiende detrás de un proxy: así req.protocol es "https"
@@ -174,7 +176,8 @@ function datosEstructurados(base, lista) {
             currenciesAccepted: "GTQ",
             priceRange: "Q" + Math.min(...precios) + " - Q" + Math.max(...precios),
             address: { "@type": "PostalAddress", addressCountry: "GT" },
-            ...(GOOGLE_BUSINESS_URL ? { sameAs: [GOOGLE_BUSINESS_URL], hasMap: GOOGLE_BUSINESS_URL } : {})
+            sameAs: [INSTAGRAM_URL, ...(GOOGLE_BUSINESS_URL ? [GOOGLE_BUSINESS_URL] : [])],
+            ...(GOOGLE_BUSINESS_URL ? { hasMap: GOOGLE_BUSINESS_URL } : {})
         },
         {
             "@context": "https://schema.org",
@@ -230,9 +233,10 @@ function etiquetasSEO(base, { titulo, descripcion, ruta, datos }) {
     ].filter(Boolean).join("\n    ");
 }
 
-// Enlaces del pie: términos, política de privacidad y ficha de Google (si está configurada).
+// Enlaces del pie: Instagram, términos, política de privacidad y ficha de Google (si está configurada).
 function enlacesPie() {
     return '<nav class="pie-enlaces" aria-label="Información">' +
+        '<a href="' + INSTAGRAM_URL + '" target="_blank" rel="noopener me">Instagram @dreasparkle_</a>' +
         '<a href="/terminos">Términos y condiciones</a>' +
         '<a href="/privacidad">Política de privacidad</a>' +
         (GOOGLE_BUSINESS_URL
