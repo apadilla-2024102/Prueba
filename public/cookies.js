@@ -20,6 +20,8 @@
 
     aviso.querySelector("button").addEventListener("click", () => {
         try { localStorage.setItem(CLAVE, "1"); } catch (e) { /* sin almacenamiento */ }
+        // Avisa a la página (por ejemplo, para mostrar la bienvenida después)
+        setTimeout(() => document.dispatchEvent(new Event("cookies-aceptadas")), 250);
         // Sale con una transición corta; si no hay transición, se quita igual
         aviso.classList.add("saliendo");
         aviso.addEventListener("transitionend", () => aviso.remove(), { once: true });

@@ -133,16 +133,15 @@
         </div>
     </dialog>
 
-    <!-- Bienvenida con mensaje de interés -->
-    <dialog class="bienvenida" id="bienvenida" aria-labelledby="bienvenida-titulo">
-        <button class="cerrar" data-cerrar aria-label="Cerrar">&times;</button>
-        <p class="bienvenida-logo" aria-hidden="true"><span class="logo"><span class="logo-drea">Drea</span><span class="logo-sparkle">Sparkle<svg class="logo-destello" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg></span></span></p>
-        <h2 id="bienvenida-titulo">¡Bienvenida!</h2>
-        <p>¿Buscas algo en especial? Escríbenos y te decimos qué hay disponible hoy.</p>
-        <a href="#" class="boton boton-principal" data-numero="41408342">Escribir al 4140-8342</a>
-        <a href="#" class="boton boton-borde" data-numero="59895169">Escribir al 5989-5169</a>
-        <button class="enlace" data-cerrar>Ver el catálogo primero</button>
-    </dialog>
+    <!-- Bienvenida: aviso pequeño abajo que no tapa la página (Google castiga las ventanas que tapan el contenido en celular) -->
+    <section class="bienvenida" id="bienvenida" aria-label="Bienvenida" hidden>
+        <button class="bienvenida-cerrar" type="button" aria-label="Cerrar">&times;</button>
+        <p><strong>¡Bienvenida!</strong> ¿Buscas algo en especial? Escríbenos y te decimos qué hay disponible hoy.</p>
+        <div class="bienvenida-acciones">
+            <a href="#" class="boton boton-principal" data-numero="41408342">WhatsApp 4140-8342</a>
+            <a href="#" class="boton boton-borde" data-numero="59895169">WhatsApp 5989-5169</a>
+        </div>
+    </section>
 
     <!-- Botón fijo de WhatsApp -->
     <a class="wa-fijo" href="#" data-numero="41408342" aria-label="Escríbenos por WhatsApp">
