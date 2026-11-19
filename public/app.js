@@ -347,7 +347,9 @@ document.querySelectorAll("dialog").forEach((d) => {
 // ---------- Bienvenida con mensaje de interés (una vez por visita) ----------
 // Es un aviso pequeño abajo: no oscurece ni tapa la página (Google baja de posición
 // a las páginas que, en celular, se cubren con una ventana apenas se abren).
-// Aparece a los 6 s, o después de aceptar el aviso de cookies, para no encimarse con él.
+// Orden: primero el aviso de cookies (solo sale hasta que se acepta, una vez por navegador)
+// y después la bienvenida, 1 s después de aceptarlo. Si las cookies ya estaban aceptadas
+// de una visita anterior, la bienvenida sale a los 3 s.
 const bienvenida = document.getElementById("bienvenida");
 
 function yaSeMostro() {
@@ -369,8 +371,8 @@ function cerrarBienvenida() {
 
 bienvenida.querySelector(".bienvenida-cerrar").addEventListener("click", cerrarBienvenida);
 bienvenida.querySelectorAll("a").forEach((a) => a.addEventListener("click", cerrarBienvenida));
-setTimeout(mostrarBienvenida, 6000);
-document.addEventListener("cookies-aceptadas", () => setTimeout(mostrarBienvenida, 1500));
+setTimeout(mostrarBienvenida, 3000);
+document.addEventListener("cookies-aceptadas", () => setTimeout(mostrarBienvenida, 1000));
 
 // ---------- Cargar datos del servidor ----------
 Promise.all([
