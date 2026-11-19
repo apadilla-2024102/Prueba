@@ -174,6 +174,7 @@ function datosEstructurados(base, lista) {
             description: "Fragancias, cuidado facial, maquillaje y joyería en Guatemala con pedidos por WhatsApp.",
             telephone: NUMEROS.map((n) => "+" + CODIGO_PAIS + n),
             currenciesAccepted: "GTQ",
+            paymentAccepted: "Pago contra entrega, depósito bancario",
             priceRange: "Q" + Math.min(...precios) + " - Q" + Math.max(...precios),
             address: { "@type": "PostalAddress", addressCountry: "GT" },
             sameAs: [INSTAGRAM_URL, ...(GOOGLE_BUSINESS_URL ? [GOOGLE_BUSINESS_URL] : [])],
@@ -286,7 +287,7 @@ app.get("/", async (req, res) => {
 // ---------- Política de privacidad y términos y condiciones ----------
 // Fecha de la última vez que se cambió el texto de cada página (views/privacidad.html y views/terminos.html).
 const PRIVACIDAD_ACTUALIZADA = "2026-10-23";
-const TERMINOS_ACTUALIZADOS = "2026-11-05";
+const TERMINOS_ACTUALIZADOS = "2026-11-19";
 
 function fechaLarga(iso) {
     const [anio, mes, dia] = iso.split("-").map(Number);
