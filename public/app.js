@@ -267,7 +267,6 @@ function abrirDetalle(id) {
     document.getElementById("detalle-cantidad").textContent = p.cantidad === 1 ? "Última pieza disponible" : "";
     verFoto(0);
 
-    if (bienvenida.open) bienvenida.close();
     detalle.showModal();
     detalle.scrollTop = 0;
 }
@@ -346,17 +345,32 @@ document.querySelectorAll("dialog").forEach((d) => {
 });
 
 // ---------- Bienvenida con mensaje de interés (una vez por visita) ----------
+// Es un aviso pequeño abajo: no oscurece ni tapa la página (Google baja de posición
+// a las páginas que, en celular, se cubren con una ventana apenas se abren).
+// Aparece a los 6 s, o después de aceptar el aviso de cookies, para no encimarse con él.
 const bienvenida = document.getElementById("bienvenida");
 
 function yaSeMostro() {
     try { return sessionStorage.getItem("bienvenida") === "1"; } catch (e) { return false; }
 }
 
-setTimeout(() => {
-    if (yaSeMostro() || detalle.open) return;
-    bienvenida.showModal();
+function mostrarBienvenida() {
+    if (yaSeMostro() || document.querySelector(".aviso-cookies")) return;
+    bienvenida.hidden = false;
+    document.body.classList.add("con-bienvenida");
     try { sessionStorage.setItem("bienvenida", "1"); } catch (e) { /* sin almacenamiento */ }
-}, 1500);
+}
+
+function cerrarBienvenida() {
+    bienvenida.classList.add("saliendo");
+    document.body.classList.remove("con-bienvenida");
+    setTimeout(() => { bienvenida.hidden = true; bienvenida.classList.remove("saliendo"); }, 200);
+}
+
+bienvenida.querySelector(".bienvenida-cerrar").addEventListener("click", cerrarBienvenida);
+bienvenida.querySelectorAll("a").forEach((a) => a.addEventListener("click", cerrarBienvenida));
+setTimeout(mostrarBienvenida, 6000);
+document.addEventListener("cookies-aceptadas", () => setTimeout(mostrarBienvenida, 1500));
 
 // ---------- Cargar datos del servidor ----------
 Promise.all([
