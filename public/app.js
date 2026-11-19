@@ -4,7 +4,10 @@ const { escapar, precioHTML, sinFotoHTML, textoBoton, ordenar, tarjetaHTML, cate
 // ---------- Aparecer al bajar ----------
 // Solo se esconde lo que todavía está fuera de pantalla, así nada parpadea al cargar.
 // Lo que entra junto aparece escalonado (50 ms entre cada uno).
-const revelador = "IntersectionObserver" in window
+// Los robots de Google y Bing toman la foto de la página sin bajar: para ellos todo se ve
+// desde el principio, sin animación (si no, en su captura salen huecos en blanco).
+const esRobot = /bot|crawler|spider|Google-InspectionTool|Lighthouse|HeadlessChrome/i.test(navigator.userAgent);
+const revelador = "IntersectionObserver" in window && !esRobot
     ? new IntersectionObserver((entradas) => {
         entradas.filter((e) => e.isIntersecting).forEach((e, i) => {
             e.target.style.setProperty("--orden", Math.min(i, 8));
