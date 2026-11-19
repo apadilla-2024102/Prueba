@@ -169,7 +169,7 @@ a { color: inherit; }
 
 .logo-grande { font-size: clamp(3.4rem, 11vw, 7.5rem); }
 
-.menu { display: flex; gap: 28px; }
+.menu { display: flex; align-items: center; gap: 28px; }
 
 .menu a {
     font-size: .9rem;
@@ -180,6 +180,51 @@ a { color: inherit; }
 }
 
 .menu a:hover { border-color: var(--frambuesa); }
+
+/* Instagram: ícono en la barra y botón en Contacto */
+.icono-ig {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+}
+.icono-ig .ig-punto { fill: currentColor; stroke: none; }
+
+.menu .menu-ig {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin: -6px 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    color: var(--tinta);
+    transition: color .2s ease, background-color .2s ease, transform 160ms var(--ease-out);
+}
+.menu .menu-ig:hover { color: var(--frambuesa); background: var(--rubor); }
+.menu .menu-ig:active { transform: scale(.92); }
+
+.contacto-ig {
+    max-width: 420px;
+    margin: 40px auto 0;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255, 255, 255, .15);
+}
+.contacto .contacto-ig p { margin: 0 auto 16px; font-size: .95rem; }
+
+.boton-ig {
+    gap: 10px;
+    color: #fff;
+    border-color: rgba(255, 255, 255, .6);
+    background: transparent;
+}
+.boton-ig:hover {
+    border-color: transparent;
+    background: linear-gradient(135deg, #f58529, #dd2a7b 50%, #8134af);
+}
 
 /* ---------- Portada ---------- */
 .portada {
