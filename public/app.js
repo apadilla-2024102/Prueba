@@ -380,6 +380,8 @@ Promise.all([
         a.rel = "noopener";
     });
 }).catch(() => {
+    // La página ya trae los productos escritos: si la carga falla, se dejan como están
+    if (document.querySelector("#rejilla .producto")) return;
     document.getElementById("contador").textContent =
         "No se pudo cargar el catálogo. Recarga la página o escríbenos por WhatsApp.";
 });

@@ -99,6 +99,12 @@ app.use(express.static(path.join(__dirname, "public"), {
 // Panel de administración oculto (/admin)
 app.use("/admin", admin);
 
+// Los datos de /api/ se pueden leer, pero no deben salir como resultados en Google
+app.use("/api", (req, res, next) => {
+    res.set("X-Robots-Tag", "noindex");
+    next();
+});
+
 // Categorías con su foto: la propia o, si no tiene, la del primer producto de esa categoría con foto
 function categoriasParaMostrar({ categorias, productos }) {
     return categorias.map((c) => {
@@ -318,11 +324,13 @@ app.get("/terminos", (req, res) => {
 });
 
 // ---------- robots.txt y sitemap.xml ----------
+// Todo se puede leer, también /api/: la página carga de ahí los productos y Google
+// necesita verlos al abrirla. Las respuestas de /api/ llevan "noindex" (más abajo),
+// así no salen como resultados sueltos en Google.
 app.get("/robots.txt", (req, res) => {
     res.type("text/plain").send(
         "User-agent: *\n" +
-        "Allow: /\n" +
-        "Disallow: /api/\n\n" +
+        "Allow: /\n\n" +
         "Sitemap: " + urlBase(req) + "/sitemap.xml\n"
     );
 });
